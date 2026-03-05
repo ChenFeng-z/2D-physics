@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "./Physics/Constants.h"
 
 bool Application::IsRunning() {
     return running;
@@ -38,7 +39,16 @@ void Application::Input() {
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Update() {
     // TODO: update all objects in the scene
-    particle->velocity = Vec2(2.0, 0.0);
+    static int timePreviousFrame;
+    int timeToWait = MILLISECS_PER_FRAME - (SDL_GetTicks() - timePreviousFrame);
+    if (timeToWait > 0) {
+        SDL_Delay(timeToWait);
+    }
+    float deltaTime = (SDL_GetTicks() - timePreviousFrame) / 1000.0f; // 将时间差转换为秒
+
+    timePreviousFrame = SDL_GetTicks();
+
+    particle->velocity = Vec2(100.0 * deltaTime, 30.0 * deltaTime);
     particle->position.Add(particle->velocity);
 
 }
