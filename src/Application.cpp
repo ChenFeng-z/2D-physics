@@ -10,6 +10,8 @@ bool Application::IsRunning() {
 void Application::Setup() {
     running = Graphics::OpenWindow();  // 系统调用，通过Graphics类打开窗口并返回是否成功打开的结果
 
+    particle = new Particle(50, 100, 1.0); // 创建一个新的粒子对象，初始位置为(200, 200)，质量为1
+
     // TODO: setup objects in the scene
 }
 
@@ -43,7 +45,7 @@ void Application::Update() {
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Render() {
     Graphics::ClearScreen(0xFF056263);  // 清屏，使用指定的颜色（十六进制ARGB格式）
-    Graphics::DrawFillCircle(200, 200, 40, 0xFFFFFFFF); // 在窗口中绘制一个填充的白色圆，圆心坐标为(200, 200)，半径为40像素
+    Graphics::DrawFillCircle(particle->position.x,particle->position.y, 4, 0xFFFFFFFF); // 在窗口中绘制一个填充的白色圆，圆心坐标为(200, 200)，半径为40像素
     Graphics::RenderFrame();
 }
 
@@ -52,6 +54,6 @@ void Application::Render() {
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Destroy() {
     // TODO: destroy all objects in the scene
-
+    delete particle; // 删除粒子对象，释放内存
     Graphics::CloseWindow();
 }
