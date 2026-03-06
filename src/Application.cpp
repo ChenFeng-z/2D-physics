@@ -45,6 +45,9 @@ void Application::Update() {
         SDL_Delay(timeToWait);
     }
     float deltaTime = (SDL_GetTicks() - timePreviousFrame) / 1000.0f; // 将时间差转换为秒
+    if (deltaTime > 0.016f) { // 如果时间差过大，限制为0.05秒，避免物体跳跃过远
+        deltaTime = 0.016f;
+    }
 
     timePreviousFrame = SDL_GetTicks();
 
