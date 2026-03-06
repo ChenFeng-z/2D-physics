@@ -52,10 +52,25 @@ void Application::Update() {
 
     timePreviousFrame = SDL_GetTicks();
 
-    particle->acceleration = Vec2(0, 9.8 * PIXELS_PER_METER); // 设置粒子的加速度为重力加速度，方向向下
+    particle->acceleration = Vec2(2.0 * PIXELS_PER_METER, 9.8 * PIXELS_PER_METER); 
 
     particle->velocity += particle->acceleration * deltaTime; // 更新粒子的速度，根据加速度和时间差计算新的速度
     particle->position += particle->velocity * deltaTime; // 更新粒子的位置，根据速度和时间差计算新的位置
+
+    if (particle->position.x - particle->radius <= 0){
+        particle->position.x = particle->radius; // 碰到左边界，调整位置
+        particle->velocity.x *= -0.9; // 反弹并减少速度
+    } else if (particle->position.x + particle->radius >= Graphics::Width()){
+        particle->position.x = Graphics::Width() - particle->radius; // 碰到右边界，调整位置
+        particle->velocity.x *= -0.9; // 反弹并减少速度
+    }
+    if (particle->position.y - particle->radius <= 0){
+        particle->position.y = particle->radius; // 碰到上边界，调整位置
+        particle->velocity.y *= -0.9; // 反弹并减少速度
+    } else if (particle->position.y + particle->radius >= Graphics::Height()){
+        particle->position.y = Graphics::Height() - particle->radius; // 碰到下边界，调整位置
+        particle->velocity.y *= -0.9; // 反弹并减少速度
+    }
 
 }
 
