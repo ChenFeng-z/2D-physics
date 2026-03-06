@@ -12,6 +12,7 @@ void Application::Setup() {
     running = Graphics::OpenWindow();  // 系统调用，通过Graphics类打开窗口并返回是否成功打开的结果
 
     particle = new Particle(50, 100, 1.0); // 创建一个新的粒子对象，初始位置为(200, 200)，质量为1
+    particle->radius = 4; // 设置粒子的半径为40像素
 
     // TODO: setup objects in the scene
 }
@@ -51,8 +52,10 @@ void Application::Update() {
 
     timePreviousFrame = SDL_GetTicks();
 
-    particle->velocity = Vec2(100.0 * deltaTime, 30.0 * deltaTime);
-    particle->position.Add(particle->velocity);
+    particle->acceleration = Vec2(0, 9.8 * PIXELS_PER_METER); // 设置粒子的加速度为重力加速度，方向向下
+
+    particle->velocity += particle->acceleration * deltaTime; // 更新粒子的速度，根据加速度和时间差计算新的速度
+    particle->position += particle->velocity * deltaTime; // 更新粒子的位置，根据速度和时间差计算新的位置
 
 }
 
@@ -61,7 +64,7 @@ void Application::Update() {
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Render() {
     Graphics::ClearScreen(0xFF056263);  // 清屏，使用指定的颜色（十六进制ARGB格式）
-    Graphics::DrawFillCircle(particle->position.x,particle->position.y, 4, 0xFFFFFFFF); // 在窗口中绘制一个填充的白色圆，圆心坐标为(200, 200)，半径为40像素
+    Graphics::DrawFillCircle(particle->position.x,particle->position.y, particle->radius, 0xFFFFFFFF); // 在窗口中绘制一个填充的白色圆，圆心坐标为(200, 200)，半径为40像素
     Graphics::RenderFrame();
 }
 
