@@ -3,11 +3,12 @@
 
 #include "./Graphics.h"
 #include "./Physics/Particle.h"
+#include <vector>
 
 class Application {
     private:
         bool running = false;
-        Particle* particle;
+        std::vector<Particle*> particles; // 存储所有粒子的容器
 
     public:
         Application() = default;
