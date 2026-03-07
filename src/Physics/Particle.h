@@ -11,6 +11,7 @@ struct Particle
     Vec2 velocity;
     Vec2 acceleration;
     float mass;
+    float inverseMass;
 
     Vec2 sumForces;
 
