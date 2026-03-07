@@ -56,7 +56,8 @@ void Application::Input() {
                 if (event.key.keysym.sym == SDLK_RIGHT)
                     pushForce.x = 0; // 松开向右箭头键时，设置推力向量的x分量为零，表示没有水平方向的推力
                 break;
-            case SDL_MOUSEBUTTONDOWN:
+            /*
+                case SDL_MOUSEBUTTONDOWN:
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     int x,y;
                     SDL_GetMouseState(&x, &y); // 获取鼠标点击的位置坐标
@@ -64,6 +65,27 @@ void Application::Input() {
                     newParticle->radius = 5; // 设置粒子的半径为5像素
                     particles.push_back(newParticle); // 将新创建的粒子添加到粒子列表中
                 }
+            */
+            case SDL_MOUSEMOTION:
+                mouseCursor.x = event.motion.x; // 更新鼠标光标的x坐标
+                mouseCursor.y = event.motion.y; // 更新鼠标光标的y坐标
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (!leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT) {
+                    leftMouseButtonDown = true; // 设置左键按下的状态为true
+                    int x, y;
+                    SDL_GetMouseState(&x, &y); // 获取鼠标点击的位置坐标
+                    mouseCursor.x = x; // 更新鼠标光标的x坐标
+                    mouseCursor.y = y; // 更新鼠标光标的y坐标
+                }
+                break;
+            case SDL_MOUSEBUTTONUP:
+                if (leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT) {
+                    leftMouseButtonDown = false; // 设置左键按下的状态为false
+                    Vec2 impulseDirection = (particles[0] -> position - mouseCursor).UnitVector();
+                    float impluseMagnitude = (particles[0] -> position - mouseCursor).Magnitude() *  5.0; // 根据鼠标点击位置与粒子位置的距离计算冲量的大小，乘以一个系数（例如10）来调整冲量的强度
+                    particles[0] -> velocity += impulseDirection * impluseMagnitude; // 将计算得到的冲量应用于粒子的速度，改变粒子的运动状态
+        }
                 break;
         }
     }
@@ -89,14 +111,10 @@ void Application::Update() {
     for (auto particle : particles) {
     
         particle->AddForce(pushForce); // 将推力作用于粒子
-    
-        Vec2 weight = Vec2(0, particle -> mass *9.81 * PIXELS_PER_METER); // 定义一个向下的重力向量
-        particle->AddForce(weight); // 将重力作用于粒子
-
-        if (particle->position.y >= liquid.y) { // 如果粒子在液体区域内
-            Vec2 dragForce = Force::GenerateDrayForce(*particle, 0.04); // 计算阻力
-            particle->AddForce(dragForce); // 将阻力作用于粒子
-        }
+        
+        Vec2 frictionForce = Force::GenerateFrictionForce(*particle, 10.0 * PIXELS_PER_METER); // 生成摩擦力，使用一个摩擦系数（例如0.5）
+        particle->AddForce(frictionForce);
+        
     }
 
     for(auto particle : particles) {
@@ -127,7 +145,7 @@ void Application::Update() {
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Render() {
     Graphics::ClearScreen(0xFF056263);  // 清屏，使用指定的颜色（十六进制ARGB格式）
-    Graphics::DrawFillRect(liquid.x + liquid.w / 2, liquid.y + liquid.h / 2, liquid.w, liquid.h, 0xFF0B3C4D); // 绘制一个填充的矩形，表示液体区域，使用指定的颜色（十六进制ARGB格式）
+    //Graphics::DrawFillRect(liquid.x + liquid.w / 2, liquid.y + liquid.h / 2, liquid.w, liquid.h, 0xFF0B3C4D); // 绘制一个填充的矩形，表示液体区域，使用指定的颜色（十六进制ARGB格式）
     for (auto particle : particles) {
         Graphics::DrawFillCircle(particle->position.x,particle->position.y, particle->radius, 0xFFFFFFFF); // 在窗口中绘制一个填充的白色圆，圆心坐标为(200, 200)，半径为40像素
     }
