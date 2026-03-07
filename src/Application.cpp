@@ -15,9 +15,6 @@ void Application::Setup() {
     smallball->radius = 4; // 设置粒子的半径为4像素
     particles.push_back(smallball);
 
-    Particle* bigball = new Particle(200,100, 3.0); // 创建另一个粒子对象
-    bigball->radius = 12; // 设置第二个粒子的半径为12像素
-    particles.push_back(bigball);
     // TODO: setup objects in the scene
 }
 
@@ -34,6 +31,24 @@ void Application::Input() {
             case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                     running = false;
+                if (event.key.keysym.sym == SDLK_UP)
+                    pushForce.y = - 50 * PIXELS_PER_METER; // 按下向上箭头键时，设置推力向量的y分量为一个负值，表示向上的推力
+                if (event.key.keysym.sym == SDLK_DOWN)
+                    pushForce.y = 50 * PIXELS_PER_METER; // 按下向下箭头键时，设置推力向量的y分量为一个正值，表示向下的推力
+                if (event.key.keysym.sym == SDLK_LEFT)
+                    pushForce.x = - 50 * PIXELS_PER_METER; // 按下向左箭头键时，设置推力向量的x分量为一个负值，表示向左的推力
+                if (event.key.keysym.sym == SDLK_RIGHT)
+                    pushForce.x = 50 * PIXELS_PER_METER; // 按下向右箭头键时，设置推力向量的x分量为一个正值，表示向右的推力
+                break;
+            case SDL_KEYUP:
+                if (event.key.keysym.sym == SDLK_UP)
+                    pushForce.y = 0; // 松开向上箭头键时，设置推力向量的y分量为零，表示没有垂直方向的推力
+                if (event.key.keysym.sym == SDLK_DOWN)
+                    pushForce.y = 0; // 松开向下箭头键时，设置推力向量的y分量为零，表示没有垂直方向的推力
+                if (event.key.keysym.sym == SDLK_LEFT)
+                    pushForce.x = 0; // 松开向左箭头键时，设置推力向量的x分量为零，表示没有水平方向的推力
+                if (event.key.keysym.sym == SDLK_RIGHT)
+                    pushForce.x = 0; // 松开向右箭头键时，设置推力向量的x分量为零，表示没有水平方向的推力
                 break;
         }
     }
@@ -59,6 +74,10 @@ void Application::Update() {
     for (auto particle : particles) {
         Vec2 Wind = Vec2(1.0 * PIXELS_PER_METER, 0); // 定义一个向右的风力向量
         particle->AddForce(Wind); // 将风力作用于粒子
+    }
+
+    for (auto particle : particles) {
+        particle->AddForce(pushForce); // 将推力作用于粒子
     }
 
     for (auto particle : particles) {
