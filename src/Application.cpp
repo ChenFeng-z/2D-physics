@@ -56,6 +56,15 @@ void Application::Input() {
                 if (event.key.keysym.sym == SDLK_RIGHT)
                     pushForce.x = 0; // 松开向右箭头键时，设置推力向量的x分量为零，表示没有水平方向的推力
                 break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    int x,y;
+                    SDL_GetMouseState(&x, &y); // 获取鼠标点击的位置坐标
+                    Particle* newParticle = new Particle(x, y, 1.0); // 创建一个新的粒子对象，初始位置为鼠标点击的位置，质量为1
+                    newParticle->radius = 5; // 设置粒子的半径为5像素
+                    particles.push_back(newParticle); // 将新创建的粒子添加到粒子列表中
+                }
+                break;
         }
     }
 }
@@ -78,8 +87,6 @@ void Application::Update() {
     timePreviousFrame = SDL_GetTicks();
     
     for (auto particle : particles) {
-        Vec2 Wind = Vec2(1.0 * PIXELS_PER_METER, 0); // 定义一个向右的风力向量
-        particle->AddForce(Wind); // 将风力作用于粒子
     
         particle->AddForce(pushForce); // 将推力作用于粒子
     
