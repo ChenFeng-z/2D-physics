@@ -52,7 +52,8 @@ void Application::Update() {
 
     timePreviousFrame = SDL_GetTicks();
 
-    particle->acceleration = Vec2(2.0 * PIXELS_PER_METER, 9.8 * PIXELS_PER_METER); 
+    Vec2 Wind = Vec2(1.0 * PIXELS_PER_METER, 0); // 定义一个向右的风力向量
+    particle->AddForce(Wind); // 将风力作用于粒子
 
     particle->Integrate(deltaTime); // 更新粒子的位置和速度
 

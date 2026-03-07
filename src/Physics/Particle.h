@@ -12,8 +12,13 @@ struct Particle
     Vec2 acceleration;
     float mass;
 
+    Vec2 sumForces;
+
     Particle(float x, float y, float mass);
     ~Particle();
+
+    void AddForce(const Vec2& force);
+    void ClearForces();
 
     void Integrate(float dt);
 };
