@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "./Physics/Constants.h"
+#include "./Physics/force.h"
 
 bool Application::IsRunning() {
     return running;
@@ -14,6 +15,11 @@ void Application::Setup() {
     Particle* smallball = new Particle(50, 100, 1.0); // 创建一个新的粒子对象，初始位置为(200, 200)，质量为1
     smallball->radius = 4; // 设置粒子的半径为4像素
     particles.push_back(smallball);
+
+    liquid.x = 0;
+    liquid.y = Graphics::Height() / 2; // 将液体区域的y坐标设置为窗口高度的一半
+    liquid.w = Graphics::Width();
+    liquid.h = Graphics::Height() / 2; // 将液体区域的高度设置为窗口高度的一半
 
     // TODO: setup objects in the scene
 }
@@ -74,15 +80,16 @@ void Application::Update() {
     for (auto particle : particles) {
         Vec2 Wind = Vec2(1.0 * PIXELS_PER_METER, 0); // 定义一个向右的风力向量
         particle->AddForce(Wind); // 将风力作用于粒子
-    }
-
-    for (auto particle : particles) {
+    
         particle->AddForce(pushForce); // 将推力作用于粒子
-    }
-
-    for (auto particle : particles) {
+    
         Vec2 weight = Vec2(0, particle -> mass *9.81 * PIXELS_PER_METER); // 定义一个向下的重力向量
         particle->AddForce(weight); // 将重力作用于粒子
+
+        if (particle->position.y >= liquid.y) { // 如果粒子在液体区域内
+            Vec2 dragForce = Force::GenerateDrayForce(*particle, 0.04); // 计算阻力
+            particle->AddForce(dragForce); // 将阻力作用于粒子
+        }
     }
 
     for(auto particle : particles) {
@@ -113,6 +120,7 @@ void Application::Update() {
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Render() {
     Graphics::ClearScreen(0xFF056263);  // 清屏，使用指定的颜色（十六进制ARGB格式）
+    Graphics::DrawFillRect(liquid.x + liquid.w / 2, liquid.y + liquid.h / 2, liquid.w, liquid.h, 0xFF0B3C4D); // 绘制一个填充的矩形，表示液体区域，使用指定的颜色（十六进制ARGB格式）
     for (auto particle : particles) {
         Graphics::DrawFillCircle(particle->position.x,particle->position.y, particle->radius, 0xFFFFFFFF); // 在窗口中绘制一个填充的白色圆，圆心坐标为(200, 200)，半径为40像素
     }
