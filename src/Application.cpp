@@ -15,7 +15,7 @@ void Application::Setup() {
     smallball->radius = 4; // 设置粒子的半径为4像素
     particles.push_back(smallball);
 
-    Particle* bigball = new Particle(50,200, 3.0); // 创建另一个粒子对象
+    Particle* bigball = new Particle(200,100, 3.0); // 创建另一个粒子对象
     bigball->radius = 12; // 设置第二个粒子的半径为12像素
     particles.push_back(bigball);
     // TODO: setup objects in the scene
@@ -62,7 +62,7 @@ void Application::Update() {
     }
 
     for (auto particle : particles) {
-        Vec2 weight = Vec2(0, 9.81 * PIXELS_PER_METER); // 定义一个向下的重力向量
+        Vec2 weight = Vec2(0, particle -> mass *9.81 * PIXELS_PER_METER); // 定义一个向下的重力向量
         particle->AddForce(weight); // 将重力作用于粒子
     }
 
