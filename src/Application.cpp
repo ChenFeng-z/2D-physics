@@ -16,11 +16,15 @@ void Application::Setup() {
     smallball->radius = 4; // 设置粒子的半径为4像素
     particles.push_back(smallball);
 
+    Particle* bigball = new Particle(500, 500, 20.0); 
+    bigball->radius = 20; 
+    particles.push_back(bigball);
+    /*
     liquid.x = 0;
     liquid.y = Graphics::Height() / 2; // 将液体区域的y坐标设置为窗口高度的一半
     liquid.w = Graphics::Width();
     liquid.h = Graphics::Height() / 2; // 将液体区域的高度设置为窗口高度的一半
-
+    */
     // TODO: setup objects in the scene
 }
 
@@ -112,10 +116,14 @@ void Application::Update() {
     
         particle->AddForce(pushForce); // 将推力作用于粒子
         
-        Vec2 frictionForce = Force::GenerateFrictionForce(*particle, 10.0 * PIXELS_PER_METER); // 生成摩擦力，使用一个摩擦系数（例如0.5）
+        Vec2 frictionForce = Force::GenerateFrictionForce(*particle, 5); // 生成摩擦力，使用一个摩擦系数（例如0.5）
         particle->AddForce(frictionForce);
         
     }
+
+    Vec2 attraction = Force::GenerateGravitationalForce(*particles[0], *particles[1], 1000.0, 5.0, 100.0); // 生成引力，使用一个引力常数（例如100）
+    particles[0]->AddForce(attraction); // 将引力作用于第一个粒子
+    particles[1]->AddForce(-attraction); // 将引力的反作用力作用于第二个粒子
 
     for(auto particle : particles) {
         particle->Integrate(deltaTime); // 更新粒子的位置和速度
@@ -146,9 +154,19 @@ void Application::Update() {
 void Application::Render() {
     Graphics::ClearScreen(0xFF056263);  // 清屏，使用指定的颜色（十六进制ARGB格式）
     //Graphics::DrawFillRect(liquid.x + liquid.w / 2, liquid.y + liquid.h / 2, liquid.w, liquid.h, 0xFF0B3C4D); // 绘制一个填充的矩形，表示液体区域，使用指定的颜色（十六进制ARGB格式）
+    
+
+    if (leftMouseButtonDown) {
+        Graphics::DrawLine(particles[0]->position.x, particles[0]->position.y, mouseCursor.x, mouseCursor.y, 0xFFFF0000); 
+    }
+
+    Graphics::DrawFillCircle(particles[0]->position.x, particles[0]->position.y, particles[0]->radius, 0xFFAA33FF); // 在窗口中绘制一个填充的白色圆，圆心坐标为(200, 200)，半径为40像素
+    Graphics::DrawFillCircle(particles[1]->position.x, particles[1]->position.y, particles[1]->radius, 0xFF00FFFF); // 在窗口中绘
+    /*默认常用
     for (auto particle : particles) {
         Graphics::DrawFillCircle(particle->position.x,particle->position.y, particle->radius, 0xFFFFFFFF); // 在窗口中绘制一个填充的白色圆，圆心坐标为(200, 200)，半径为40像素
     }
+    */
     Graphics::RenderFrame();
 }
 

@@ -1,6 +1,7 @@
 #include "./Force.h"
+#include <algorithm>
 
-Vec2 Force::GenerateDrayForce(const Particle& particle, float k) {
+Vec2 Force::GenerateDragForce(const Particle& particle, float k) {
     Vec2 dragForce = Vec2(0, 0);
     if (particle.velocity.MagnitudeSquared() > 0) {
         dragForce = particle.velocity.UnitVector() * -1; // 反向
@@ -17,4 +18,14 @@ Vec2 Force::GenerateFrictionForce(const Particle& particle, float k) {
         frictionForce *= fricationMagitude; 
     }
     return frictionForce;
+}
+
+Vec2 Force::GenerateGravitationalForce(const Particle& a, const Particle& b, float G, float minDistance, float maxDistance) {
+    Vec2 d = b.position - a.position; // 计算两个粒子之间的距离向量
+    float distanceSquared = d.MagnitudeSquared();
+    distanceSquared = std::clamp(distanceSquared, minDistance, maxDistance); // 限制距离的平方在最小和最大值之间，避免过大或过小导致的数值不稳定
+    Vec2 attractionDirection = d.UnitVector(); // 计算引力的方向
+    float attractionMagnitude = G * a.mass * b.mass / distanceSquared; 
+    Vec2 attractionForce = attractionDirection * attractionMagnitude; // 计算引力的大小，使用万有引力公式 F = G * m1 * m2 / r^2
+    return attractionForce;
 }
