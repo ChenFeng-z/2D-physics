@@ -46,7 +46,7 @@ void Application::Update() {
         SDL_Delay(timeToWait);
     }
     float deltaTime = (SDL_GetTicks() - timePreviousFrame) / 1000.0f; // 将时间差转换为秒
-    if (deltaTime > 0.016f) { // 如果时间差过大，限制为0.05秒，避免物体跳跃过远
+    if (deltaTime > 0.016f) { 
         deltaTime = 0.016f;
     }
 
@@ -54,8 +54,7 @@ void Application::Update() {
 
     particle->acceleration = Vec2(2.0 * PIXELS_PER_METER, 9.8 * PIXELS_PER_METER); 
 
-    particle->velocity += particle->acceleration * deltaTime; // 更新粒子的速度，根据加速度和时间差计算新的速度
-    particle->position += particle->velocity * deltaTime; // 更新粒子的位置，根据速度和时间差计算新的位置
+    particle->Integrate(deltaTime); // 更新粒子的位置和速度
 
     if (particle->position.x - particle->radius <= 0){
         particle->position.x = particle->radius; // 碰到左边界，调整位置
