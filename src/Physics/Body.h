@@ -15,6 +15,10 @@ struct Body
 
     Vec2 sumForces;
 
+    float rotation;
+    float angularVelocity;
+    float angularAcceleration;
+
     Shape* shape = NULL;
 
     Body(const Shape& shape, float x, float y, float mass);
