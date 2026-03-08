@@ -12,21 +12,27 @@ struct Body
     Vec2 acceleration;
     float mass;
     float inverseMass;
+    float I;
+    float invI;
 
     Vec2 sumForces;
+    float sumTorque;
 
     float rotation;
     float angularVelocity;
     float angularAcceleration;
 
-    Shape* shape = NULL;
+    Shape* shape = nullptr;
 
     Body(const Shape& shape, float x, float y, float mass);
     ~Body();
 
     void AddForce(const Vec2& force);
+    void AddTorque(float torque);
+    void ClearTorque();
     void ClearForces();
 
-    void Integrate(float dt);
+    void IntegrateLinear(float dt);
+    void IntegrateAngular(float dt);
 };
 #endif

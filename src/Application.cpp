@@ -123,7 +123,11 @@ void Application::Update() {
 
 
     for(auto body : bodies) {
-        body->Integrate(deltaTime); // 更新粒子的位置和速度
+        body->IntegrateLinear(deltaTime); // 更新粒子的位置和速度
+        body->IntegrateAngular(deltaTime); // 更新粒子的旋转角度和角速度
+
+        float torque = 20;
+        body -> AddTorque(torque);
     }
 
     for(auto body : bodies) {
@@ -155,18 +159,16 @@ void Application::Render() {
     Graphics::ClearScreen(0xFF056263);  // 清屏，使用指定的颜色（十六进制ARGB格式）
     //Graphics::DrawFillRect(liquid.x + liquid.w / 2, liquid.y + liquid.h / 2, liquid.w, liquid.h, 0xFF0B3C4D); // 绘制一个填充的矩形，表示液体区域，使用指定的颜色（十六进制ARGB格式）
     
-    static float angle = 0.0f; // 定义一个静态变量来存储旋转角度，初始值为0
 
     for (auto body : bodies) {
         if (body->shape->GetType() == CIRCLE) {
             CircleShape* circleShape = (CircleShape*)body->shape; // 将粒子的形状转换为CircleShape类型，以便访问半径属性
-            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, angle,0xFFEEBB00); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
+            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation,0xFFEEBB00); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
         }else{
 
         }
         
     }
-    angle += 0.01;
 
     /*默认常用
     for (auto body : bodies) {
