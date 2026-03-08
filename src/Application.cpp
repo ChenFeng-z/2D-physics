@@ -14,11 +14,8 @@ void Application::Setup() {
 
     anchor = Vec2(Graphics::Width() / 2, 30);
 
-    for (int i = 0; i < NUM_PARTICLES; i++) {
-        Body* bob = new Body(CircleShape(50), Graphics::Width() / 2,Graphics::Height() / 2, 1.0); 
-        bob->radius = 4; // 设置粒子的半径为6像素
-        bodies.push_back(bob); // 将新创建的粒子添加到粒子列表中
-    }
+    Body* bob = new Body(CircleShape(50), Graphics::Width() / 2,Graphics::Height() / 2, 1.0); 
+    bodies.push_back(bob); // 将新创建的粒子添加到粒子列表中
     /*
     liquid.x = 0;
     liquid.y = Graphics::Height() / 2; // 将液体区域的y坐标设置为窗口高度的一半
@@ -124,38 +121,31 @@ void Application::Update() {
         
     }
 
-    Vec2 springForce = Force::GenerateSpringForce(*bodies[0], anchor, restLength, k);
-    bodies[0]->AddForce(springForce);
-
-    for(int i = 1; i < NUM_PARTICLES; i++) {
-        int currBody = i;
-        int prevBody = i - 1;
-        Vec2 springForce = Force::GenerateSpringForce(*bodies[currBody], *bodies[prevBody], restLength, k);
-        bodies[currBody]->AddForce(springForce);
-        bodies[prevBody]->AddForce(-springForce);
-    }
 
     for(auto body : bodies) {
         body->Integrate(deltaTime); // 更新粒子的位置和速度
     }
 
     for(auto body : bodies) {
-        if (body->position.x - body->radius <= 0){
-            body->position.x = body->radius; // 碰到左边界，调整位置
-            body->velocity.x *= -0.9; // 反弹并减少速度
-        } else if (body->position.x + body->radius >= Graphics::Width()){
-            body->position.x = Graphics::Width() - body->radius; // 碰到右边界，调整位置
-            body->velocity.x *= -0.9; // 反弹并减少速度
-        }
-        if (body->position.y - body->radius <= 0){
-            body->position.y = body->radius; // 碰到上边界，调整位置
-            body->velocity.y *= -0.9; // 反弹并减少速度
-        } else if (body->position.y + body->radius >= Graphics::Height()){
-            body->position.y = Graphics::Height() - body->radius; // 碰到下边界，调整位置
-            body->velocity.y *= -0.9; // 反弹并减少速度
-        }
+        if (body->shape->GetType() == CIRCLE) {
+            CircleShape* circleShape = (CircleShape*)body->shape; // 将粒子的形状转换为CircleShape类型，以便访问半径属性
+            if (body->position.x - circleShape->radius <= 0){
+                body->position.x = circleShape->radius; // 碰到左边界，调整位置
+                body->velocity.x *= -0.9; // 反弹并减少速度
+            } else if (body->position.x + circleShape->radius >= Graphics::Width()){
+                body->position.x = Graphics::Width() - circleShape->radius; // 碰到右边界，调整位置
+                body->velocity.x *= -0.9; // 反弹并减少速度
+            }
+            if (body->position.y - circleShape->radius <= 0){
+                body->position.y = circleShape->radius; // 碰到上边界，调整位置
+                body->velocity.y *= -0.9; // 反弹并减少速度
+            } else if (body->position.y + circleShape->radius >= Graphics::Height()){
+                body->position.y = Graphics::Height() - circleShape->radius; // 碰到下边界，调整位置
+                body->velocity.y *= -0.9; // 反弹并减少速度
+            }
     }
 
+}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -165,25 +155,18 @@ void Application::Render() {
     Graphics::ClearScreen(0xFF056263);  // 清屏，使用指定的颜色（十六进制ARGB格式）
     //Graphics::DrawFillRect(liquid.x + liquid.w / 2, liquid.y + liquid.h / 2, liquid.w, liquid.h, 0xFF0B3C4D); // 绘制一个填充的矩形，表示液体区域，使用指定的颜色（十六进制ARGB格式）
     
-
-    if (leftMouseButtonDown) {
-        int lastBody = NUM_PARTICLES - 1; // 获取最后一个粒子的索引
-        Graphics::DrawLine(bodies[lastBody]->position.x, bodies[lastBody]->position.y, mouseCursor.x, mouseCursor.y, 0xFFFF0000); 
-    }
-
-    Graphics::DrawFillCircle(anchor.x, anchor.y, 5, 0xFF001155); // 绘制一个填充的黄色圆，表示锚点，圆心坐标为anchor，半径为5像素
-    Graphics::DrawLine(anchor.x, anchor.y, bodies[0]->position.x, bodies[0]->position.y, 0xFF313131); // 绘制一条线，连接锚点和第一个粒子，使用指定的颜色（十六进制ARGB格式）
-
-    for (int i = 0; i < NUM_PARTICLES - 1; i++) {
-        int currBody = i;
-        int nextBody = i + 1;
-        Graphics::DrawLine(bodies[currBody]->position.x, bodies[currBody]->position.y, bodies[nextBody]->position.x, bodies[nextBody]->position.y, 0xFF313131); // 绘制一条线，连接当前粒子和下一个粒子，使用指定的颜色（十六进制ARGB格式）
-    }
+    static float angle = 0.0f; // 定义一个静态变量来存储旋转角度，初始值为0
 
     for (auto body : bodies) {
-        Graphics::DrawFillCircle(body->position.x, body->position.y, body->radius, 0xFFEEBB00); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
+        if (body->shape->GetType() == CIRCLE) {
+            CircleShape* circleShape = (CircleShape*)body->shape; // 将粒子的形状转换为CircleShape类型，以便访问半径属性
+            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, angle,0xFFEEBB00); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
+        }else{
+
+        }
+        
     }
-    
+    angle += 0.01;
 
     /*默认常用
     for (auto body : bodies) {
