@@ -15,8 +15,9 @@ class Application {
         SDL_Rect liquid; // 定义一个矩形，表示液体区域
 
         Vec2 anchor = Vec2(0,0);
-        float k = 40;
-        float restLength = 200;
+        float k = 50;
+        float restLength = 15;
+        const int NUM_PARTICLES = 5;
 
     public:
         Application() = default;

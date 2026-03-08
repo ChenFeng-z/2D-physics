@@ -14,9 +14,11 @@ void Application::Setup() {
 
     anchor = Vec2(Graphics::Width() / 2, 30);
 
-    Particle* bob = new Particle(Graphics::Width() / 2, Graphics::Height() / 2, 2.0);
-    bob->radius = 10;
-    particles.push_back(bob); 
+    for (int i = 0; i < NUM_PARTICLES; i++) {
+        Particle* bob = new Particle(anchor.x, anchor.y + ((i + 1) * restLength), 1.0); // 创建一个新的粒子对象，初始位置为窗口中心上方，质量为1
+        bob->radius = 6; // 设置粒子的半径为6像素
+        particles.push_back(bob); // 将新创建的粒子添加到粒子列表中
+    }
     /*
     liquid.x = 0;
     liquid.y = Graphics::Height() / 2; // 将液体区域的y坐标设置为窗口高度的一半
@@ -84,9 +86,10 @@ void Application::Input() {
             case SDL_MOUSEBUTTONUP:
                 if (leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT) {
                     leftMouseButtonDown = false; // 设置左键按下的状态为false
-                    Vec2 impulseDirection = (particles[0] -> position - mouseCursor).UnitVector();
-                    float impluseMagnitude = (particles[0] -> position - mouseCursor).Magnitude() *  5.0; // 根据鼠标点击位置与粒子位置的距离计算冲量的大小，乘以一个系数（例如10）来调整冲量的强度
-                    particles[0] -> velocity += impulseDirection * impluseMagnitude; // 将计算得到的冲量应用于粒子的速度，改变粒子的运动状态
+                    int lastParticle = NUM_PARTICLES - 1; // 获取最后一个粒子的索引
+                    Vec2 impulseDirection = (particles[lastParticle] -> position - mouseCursor).UnitVector();
+                    float impluseMagnitude = (particles[lastParticle] -> position - mouseCursor).Magnitude() *  5.0; // 根据鼠标点击位置与粒子位置的距离计算冲量的大小，乘以一个系数（例如10）来调整冲量的强度
+                    particles[lastParticle] -> velocity += impulseDirection * impluseMagnitude; // 将计算得到的冲量应用于粒子的速度，改变粒子的运动状态
         }
                 break;
         }
@@ -113,16 +116,24 @@ void Application::Update() {
     for (auto particle : particles) {
     
         particle->AddForce(pushForce); // 将推力作用于粒子
-        Vec2 drag = Force::GenerateDragForce(*particle, 0.001); // 生成阻力，使用一个阻力系数（例如0.5）
+        Vec2 drag = Force::GenerateDragForce(*particle, 0.01); // 生成阻力，使用一个阻力系数（例如0.5）
         particle->AddForce(drag);
 
-        Vec2 weight = Vec2(0, 9.8 * particle->mass) * PIXELS_PER_METER; 
+        Vec2 weight = Vec2(0, 9.8 * particle->mass* PIXELS_PER_METER); //
         particle->AddForce(weight);
         
     }
 
     Vec2 springForce = Force::GenerateSpringForce(*particles[0], anchor, restLength, k);
     particles[0]->AddForce(springForce);
+
+    for(int i = 1; i < NUM_PARTICLES; i++) {
+        int currParticle = i;
+        int prevParticle = i - 1;
+        Vec2 springForce = Force::GenerateSpringForce(*particles[currParticle], *particles[prevParticle], restLength, k);
+        particles[currParticle]->AddForce(springForce);
+        particles[prevParticle]->AddForce(-springForce);
+    }
 
     for(auto particle : particles) {
         particle->Integrate(deltaTime); // 更新粒子的位置和速度
@@ -156,13 +167,24 @@ void Application::Render() {
     
 
     if (leftMouseButtonDown) {
-        Graphics::DrawLine(particles[0]->position.x, particles[0]->position.y, mouseCursor.x, mouseCursor.y, 0xFFFF0000); 
+        int lastParticle = NUM_PARTICLES - 1; // 获取最后一个粒子的索引
+        Graphics::DrawLine(particles[lastParticle]->position.x, particles[lastParticle]->position.y, mouseCursor.x, mouseCursor.y, 0xFFFF0000); 
     }
 
-    Graphics::DrawLine(anchor.x, anchor.y, particles[0]->position.x, particles[0]->position.y, 0xFF313131); // 绘制一条蓝色的线段，连接锚点和粒子的位置，表示弹簧的连接
     Graphics::DrawFillCircle(anchor.x, anchor.y, 5, 0xFF001155); // 绘制一个填充的黄色圆，表示锚点，圆心坐标为anchor，半径为5像素
-    Graphics::DrawFillCircle(particles[0]->position.x, particles[0]->position.y, particles[0]->radius, 0xFFFFFFFF); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
+    Graphics::DrawLine(anchor.x, anchor.y, particles[0]->position.x, particles[0]->position.y, 0xFF313131); // 绘制一条线，连接锚点和第一个粒子，使用指定的颜色（十六进制ARGB格式）
+
+    for (int i = 0; i < NUM_PARTICLES - 1; i++) {
+        int currParticle = i;
+        int nextParticle = i + 1;
+        Graphics::DrawLine(particles[currParticle]->position.x, particles[currParticle]->position.y, particles[nextParticle]->position.x, particles[nextParticle]->position.y, 0xFF313131); // 绘制一条线，连接当前粒子和下一个粒子，使用指定的颜色（十六进制ARGB格式）
+    }
+
+    for (auto particle : particles) {
+        Graphics::DrawFillCircle(particle->position.x, particle->position.y, particle->radius, 0xFFEEBB00); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
+    }
     
+
     /*默认常用
     for (auto particle : particles) {
         Graphics::DrawFillCircle(particle->position.x,particle->position.y, particle->radius, 0xFFFFFFFF); // 在窗口中绘制一个填充的白色圆，圆心坐标为(200, 200)，半径为40像素
