@@ -38,3 +38,12 @@ Vec2 Force::GenerateSpringForce(const Particle& particle, Vec2 anchor, float res
     Vec2 springForce = springDirection * springMagnitude; // 弹力的方向与伸长量相反
     return springForce;
 }
+
+Vec2 Force::GenerateSpringForce(const Particle& a, const Particle& b, float restLength, float k) {
+    Vec2 d = b.position - a.position; // 计算两个粒子之间的距离向量
+    float displacement = d.Magnitude() - restLength; // 计算弹簧的伸长量（当前距离 - 休息长度）
+    Vec2 springDirection = d.UnitVector(); // 计算弹力的方向
+    float springMagnitude = -k * displacement; // 计算弹力的大小，使用胡克定律 F = -k * x，其中 x 是弹簧的伸长量（当前距离 - 休息长度）
+    Vec2 springForce = springDirection * springMagnitude; // 弹力的方向与伸长量相反
+    return springForce;
+}
