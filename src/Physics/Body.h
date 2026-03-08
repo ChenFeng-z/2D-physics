@@ -3,7 +3,7 @@
 
 #include "Vec2.h"
 
-struct Particle
+struct Body
 {
     int radius;
     
@@ -15,8 +15,8 @@ struct Particle
 
     Vec2 sumForces;
 
-    Particle(float x, float y, float mass);
-    ~Particle();
+    Body(float x, float y, float mass);
+    ~Body();
 
     void AddForce(const Vec2& force);
     void ClearForces();

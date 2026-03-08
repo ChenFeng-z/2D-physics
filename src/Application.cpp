@@ -15,9 +15,9 @@ void Application::Setup() {
     anchor = Vec2(Graphics::Width() / 2, 30);
 
     for (int i = 0; i < NUM_PARTICLES; i++) {
-        Particle* bob = new Particle(anchor.x, anchor.y + ((i + 1) * restLength), 1.0); // 创建一个新的粒子对象，初始位置为窗口中心上方，质量为1
+        Body* bob = new Body(anchor.x, anchor.y + ((i + 1) * restLength), 1.0); // 创建一个新的粒子对象，初始位置为窗口中心上方，质量为1
         bob->radius = 6; // 设置粒子的半径为6像素
-        particles.push_back(bob); // 将新创建的粒子添加到粒子列表中
+        bodies.push_back(bob); // 将新创建的粒子添加到粒子列表中
     }
     /*
     liquid.x = 0;
@@ -65,9 +65,9 @@ void Application::Input() {
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     int x,y;
                     SDL_GetMouseState(&x, &y); // 获取鼠标点击的位置坐标
-                    Particle* newParticle = new Particle(x, y, 1.0); // 创建一个新的粒子对象，初始位置为鼠标点击的位置，质量为1
-                    newParticle->radius = 5; // 设置粒子的半径为5像素
-                    particles.push_back(newParticle); // 将新创建的粒子添加到粒子列表中
+                    Body* newBody = new Body(x, y, 1.0); // 创建一个新的粒子对象，初始位置为鼠标点击的位置，质量为1
+                    newBody->radius = 5; // 设置粒子的半径为5像素
+                    bodies.push_back(newBody); // 将新创建的粒子添加到粒子列表中
                 }
             */
             case SDL_MOUSEMOTION:
@@ -86,10 +86,10 @@ void Application::Input() {
             case SDL_MOUSEBUTTONUP:
                 if (leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT) {
                     leftMouseButtonDown = false; // 设置左键按下的状态为false
-                    int lastParticle = NUM_PARTICLES - 1; // 获取最后一个粒子的索引
-                    Vec2 impulseDirection = (particles[lastParticle] -> position - mouseCursor).UnitVector();
-                    float impluseMagnitude = (particles[lastParticle] -> position - mouseCursor).Magnitude() *  5.0; // 根据鼠标点击位置与粒子位置的距离计算冲量的大小，乘以一个系数（例如10）来调整冲量的强度
-                    particles[lastParticle] -> velocity += impulseDirection * impluseMagnitude; // 将计算得到的冲量应用于粒子的速度，改变粒子的运动状态
+                    int lastBody = NUM_PARTICLES - 1; // 获取最后一个粒子的索引
+                    Vec2 impulseDirection = (bodies[lastBody] -> position - mouseCursor).UnitVector();
+                    float impluseMagnitude = (bodies[lastBody] -> position - mouseCursor).Magnitude() *  5.0; // 根据鼠标点击位置与粒子位置的距离计算冲量的大小，乘以一个系数（例如10）来调整冲量的强度
+                    bodies[lastBody] -> velocity += impulseDirection * impluseMagnitude; // 将计算得到的冲量应用于粒子的速度，改变粒子的运动状态
         }
                 break;
         }
@@ -113,46 +113,46 @@ void Application::Update() {
 
     timePreviousFrame = SDL_GetTicks();
     
-    for (auto particle : particles) {
+    for (auto body : bodies) {
     
-        particle->AddForce(pushForce); // 将推力作用于粒子
-        Vec2 drag = Force::GenerateDragForce(*particle, 0.01); // 生成阻力，使用一个阻力系数（例如0.5）
-        particle->AddForce(drag);
+        body->AddForce(pushForce); // 将推力作用于粒子
+        Vec2 drag = Force::GenerateDragForce(*body, 0.01); // 生成阻力，使用一个阻力系数（例如0.5）
+        body->AddForce(drag);
 
-        Vec2 weight = Vec2(0, 9.8 * particle->mass* PIXELS_PER_METER); //
-        particle->AddForce(weight);
+        Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
+        body->AddForce(weight);
         
     }
 
-    Vec2 springForce = Force::GenerateSpringForce(*particles[0], anchor, restLength, k);
-    particles[0]->AddForce(springForce);
+    Vec2 springForce = Force::GenerateSpringForce(*bodies[0], anchor, restLength, k);
+    bodies[0]->AddForce(springForce);
 
     for(int i = 1; i < NUM_PARTICLES; i++) {
-        int currParticle = i;
-        int prevParticle = i - 1;
-        Vec2 springForce = Force::GenerateSpringForce(*particles[currParticle], *particles[prevParticle], restLength, k);
-        particles[currParticle]->AddForce(springForce);
-        particles[prevParticle]->AddForce(-springForce);
+        int currBody = i;
+        int prevBody = i - 1;
+        Vec2 springForce = Force::GenerateSpringForce(*bodies[currBody], *bodies[prevBody], restLength, k);
+        bodies[currBody]->AddForce(springForce);
+        bodies[prevBody]->AddForce(-springForce);
     }
 
-    for(auto particle : particles) {
-        particle->Integrate(deltaTime); // 更新粒子的位置和速度
+    for(auto body : bodies) {
+        body->Integrate(deltaTime); // 更新粒子的位置和速度
     }
 
-    for(auto particle : particles) {
-        if (particle->position.x - particle->radius <= 0){
-            particle->position.x = particle->radius; // 碰到左边界，调整位置
-            particle->velocity.x *= -0.9; // 反弹并减少速度
-        } else if (particle->position.x + particle->radius >= Graphics::Width()){
-            particle->position.x = Graphics::Width() - particle->radius; // 碰到右边界，调整位置
-            particle->velocity.x *= -0.9; // 反弹并减少速度
+    for(auto body : bodies) {
+        if (body->position.x - body->radius <= 0){
+            body->position.x = body->radius; // 碰到左边界，调整位置
+            body->velocity.x *= -0.9; // 反弹并减少速度
+        } else if (body->position.x + body->radius >= Graphics::Width()){
+            body->position.x = Graphics::Width() - body->radius; // 碰到右边界，调整位置
+            body->velocity.x *= -0.9; // 反弹并减少速度
         }
-        if (particle->position.y - particle->radius <= 0){
-            particle->position.y = particle->radius; // 碰到上边界，调整位置
-            particle->velocity.y *= -0.9; // 反弹并减少速度
-        } else if (particle->position.y + particle->radius >= Graphics::Height()){
-            particle->position.y = Graphics::Height() - particle->radius; // 碰到下边界，调整位置
-            particle->velocity.y *= -0.9; // 反弹并减少速度
+        if (body->position.y - body->radius <= 0){
+            body->position.y = body->radius; // 碰到上边界，调整位置
+            body->velocity.y *= -0.9; // 反弹并减少速度
+        } else if (body->position.y + body->radius >= Graphics::Height()){
+            body->position.y = Graphics::Height() - body->radius; // 碰到下边界，调整位置
+            body->velocity.y *= -0.9; // 反弹并减少速度
         }
     }
 
@@ -167,27 +167,27 @@ void Application::Render() {
     
 
     if (leftMouseButtonDown) {
-        int lastParticle = NUM_PARTICLES - 1; // 获取最后一个粒子的索引
-        Graphics::DrawLine(particles[lastParticle]->position.x, particles[lastParticle]->position.y, mouseCursor.x, mouseCursor.y, 0xFFFF0000); 
+        int lastBody = NUM_PARTICLES - 1; // 获取最后一个粒子的索引
+        Graphics::DrawLine(bodies[lastBody]->position.x, bodies[lastBody]->position.y, mouseCursor.x, mouseCursor.y, 0xFFFF0000); 
     }
 
     Graphics::DrawFillCircle(anchor.x, anchor.y, 5, 0xFF001155); // 绘制一个填充的黄色圆，表示锚点，圆心坐标为anchor，半径为5像素
-    Graphics::DrawLine(anchor.x, anchor.y, particles[0]->position.x, particles[0]->position.y, 0xFF313131); // 绘制一条线，连接锚点和第一个粒子，使用指定的颜色（十六进制ARGB格式）
+    Graphics::DrawLine(anchor.x, anchor.y, bodies[0]->position.x, bodies[0]->position.y, 0xFF313131); // 绘制一条线，连接锚点和第一个粒子，使用指定的颜色（十六进制ARGB格式）
 
     for (int i = 0; i < NUM_PARTICLES - 1; i++) {
-        int currParticle = i;
-        int nextParticle = i + 1;
-        Graphics::DrawLine(particles[currParticle]->position.x, particles[currParticle]->position.y, particles[nextParticle]->position.x, particles[nextParticle]->position.y, 0xFF313131); // 绘制一条线，连接当前粒子和下一个粒子，使用指定的颜色（十六进制ARGB格式）
+        int currBody = i;
+        int nextBody = i + 1;
+        Graphics::DrawLine(bodies[currBody]->position.x, bodies[currBody]->position.y, bodies[nextBody]->position.x, bodies[nextBody]->position.y, 0xFF313131); // 绘制一条线，连接当前粒子和下一个粒子，使用指定的颜色（十六进制ARGB格式）
     }
 
-    for (auto particle : particles) {
-        Graphics::DrawFillCircle(particle->position.x, particle->position.y, particle->radius, 0xFFEEBB00); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
+    for (auto body : bodies) {
+        Graphics::DrawFillCircle(body->position.x, body->position.y, body->radius, 0xFFEEBB00); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
     }
     
 
     /*默认常用
-    for (auto particle : particles) {
-        Graphics::DrawFillCircle(particle->position.x,particle->position.y, particle->radius, 0xFFFFFFFF); // 在窗口中绘制一个填充的白色圆，圆心坐标为(200, 200)，半径为40像素
+    for (auto body : bodies) {
+        Graphics::DrawFillCircle(body->position.x,body->position.y, body->radius, 0xFFFFFFFF); // 在窗口中绘制一个填充的白色圆，圆心坐标为(200, 200)，半径为40像素
     }
     */
     Graphics::RenderFrame();
@@ -198,8 +198,8 @@ void Application::Render() {
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Destroy() {
     // TODO: destroy all objects in the scene
-    for(auto particle : particles) {
-        delete particle; // 释放粒子对象的内存
+    for(auto body : bodies) {
+        delete body; // 释放粒子对象的内存
     }
     Graphics::CloseWindow();
 }
