@@ -14,8 +14,8 @@ void Application::Setup() {
 
     anchor = Vec2(Graphics::Width() / 2, 30);
 
-    Body* bob = new Body(CircleShape(50), Graphics::Width() / 2,Graphics::Height() / 2, 1.0); 
-    bodies.push_back(bob); // 将新创建的粒子添加到粒子列表中
+    Body* box = new Body(BoxShape(200, 100), Graphics::Width() / 2,Graphics::Height() / 2, 1.0); 
+    bodies.push_back(box); // 将新创建的粒子添加到粒子列表中
     /*
     liquid.x = 0;
     liquid.y = Graphics::Height() / 2; // 将液体区域的y坐标设置为窗口高度的一半
@@ -112,13 +112,14 @@ void Application::Update() {
     
     for (auto body : bodies) {
     
-        body->AddForce(pushForce); // 将推力作用于粒子
-        Vec2 drag = Force::GenerateDragForce(*body, 0.01); // 生成阻力，使用一个阻力系数（例如0.5）
-        body->AddForce(drag);
+        //body->AddForce(pushForce); // 将推力作用于粒子
+        //Vec2 drag = Force::GenerateDragForce(*body, 0.01); // 生成阻力，使用一个阻力系数（例如0.5）
+        //body->AddForce(drag);
 
-        Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
-        body->AddForce(weight);
-        
+        //Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
+        //body->AddForce(weight);
+        //float torque = 20;
+        //body -> AddTorque(torque);
     }
 
 
@@ -126,8 +127,6 @@ void Application::Update() {
         body->IntegrateLinear(deltaTime); // 更新粒子的位置和速度
         body->IntegrateAngular(deltaTime); // 更新粒子的旋转角度和角速度
 
-        float torque = 20;
-        body -> AddTorque(torque);
     }
 
     for(auto body : bodies) {
@@ -164,9 +163,12 @@ void Application::Render() {
         if (body->shape->GetType() == CIRCLE) {
             CircleShape* circleShape = (CircleShape*)body->shape; // 将粒子的形状转换为CircleShape类型，以便访问半径属性
             Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation,0xFFEEBB00); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
-        }else{
-
         }
+        if (body->shape->GetType() == BOX) {
+            BoxShape* boxShape = (BoxShape*)body->shape; // 将粒子的形状转换为BoxShape类型，以便访问宽度和高度属性
+            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->vertices, 0xFFEEBB00); // 在窗口中绘制一个填充的白色矩形，矩形中心坐标为粒子的位置，宽度和高度为粒子的宽度和高度
+        }
+        
         
     }
 

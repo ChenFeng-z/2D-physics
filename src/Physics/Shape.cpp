@@ -1,5 +1,6 @@
 #include "Shape.h"
 #include <iostream>
+#include <vector>
 
 CircleShape::CircleShape(const float radius) {
     this->radius = radius;
@@ -44,7 +45,14 @@ float PolygonShape::GetMomentOfInertia() const {
 }
 
 BoxShape::BoxShape(const float width, const float height) {
+    this->width = width;
+    this->height = height;
     
+
+    vertices.push_back(Vec2(-width / 2, -height / 2)); // 左上角
+    vertices.push_back(Vec2(width / 2, -height / 2)); // 右上角
+    vertices.push_back(Vec2(width / 2, height / 2)); // 右下角
+    vertices.push_back(Vec2(-width / 2, height / 2)); // 左下角
 }
 BoxShape::~BoxShape() {
 }
