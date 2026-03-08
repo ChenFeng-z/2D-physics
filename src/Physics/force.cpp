@@ -29,3 +29,12 @@ Vec2 Force::GenerateGravitationalForce(const Particle& a, const Particle& b, flo
     Vec2 attractionForce = attractionDirection * attractionMagnitude; // 计算引力的大小，使用万有引力公式 F = G * m1 * m2 / r^2
     return attractionForce;
 }
+
+Vec2 Force::GenerateSpringForce(const Particle& particle, Vec2 anchor, float restLength, float k) {
+    Vec2 d = particle.position - anchor; // 计算粒子与锚点之间的距离向量
+    float displacement = d.Magnitude() - restLength; // 计算弹簧的伸长量（当前距离 - 休息长度）
+    Vec2 springDirection = d.UnitVector(); // 计算弹力的方向
+    float springMagnitude = -k * displacement; // 计算弹力的大小，使用胡克定律 F = -k * x，其中 x 是弹簧的伸长量（当前距离 - 休息长度）
+    Vec2 springForce = springDirection * springMagnitude; // 弹力的方向与伸长量相反
+    return springForce;
+}

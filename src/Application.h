@@ -14,6 +14,10 @@ class Application {
         bool leftMouseButtonDown = false; // 定义一个布尔变量，表示左键是否按下
         SDL_Rect liquid; // 定义一个矩形，表示液体区域
 
+        Vec2 anchor = Vec2(0,0);
+        float k = 40;
+        float restLength = 200;
+
     public:
         Application() = default;
         ~Application() = default;
