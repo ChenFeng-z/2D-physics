@@ -2,6 +2,7 @@
 #define PARTICLE_H
 
 #include "Vec2.h"
+#include "Shape.h"
 
 struct Body
 {
@@ -15,7 +16,9 @@ struct Body
 
     Vec2 sumForces;
 
-    Body(float x, float y, float mass);
+    Shape* shape = NULL;
+
+    Body(const Shape& shape, float x, float y, float mass);
     ~Body();
 
     void AddForce(const Vec2& force);

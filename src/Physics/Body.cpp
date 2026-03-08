@@ -1,7 +1,8 @@
 #include "body.h"
 #include <iostream>
 
-Body::Body(float x, float y, float mass) {
+Body::Body(const Shape& shape, float x, float y, float mass) {
+    this->shape = shape.Clone(); 
     this->position = Vec2(x, y);
     this->mass = mass;
     this->inverseMass = (mass != 0) ? 1.0f / mass : 0.0f; // 计算质量的倒数，避免除以零
@@ -9,6 +10,7 @@ Body::Body(float x, float y, float mass) {
 }
 
 Body ::~Body() {
+    delete shape; // 释放shape对象的内存
     std::cout << "Body destructor called!" << std::endl;
 }
 

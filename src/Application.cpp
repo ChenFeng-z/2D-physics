@@ -15,8 +15,8 @@ void Application::Setup() {
     anchor = Vec2(Graphics::Width() / 2, 30);
 
     for (int i = 0; i < NUM_PARTICLES; i++) {
-        Body* bob = new Body(anchor.x, anchor.y + ((i + 1) * restLength), 1.0); // 创建一个新的粒子对象，初始位置为窗口中心上方，质量为1
-        bob->radius = 6; // 设置粒子的半径为6像素
+        Body* bob = new Body(CircleShape(50), Graphics::Width() / 2,Graphics::Height() / 2, 1.0); 
+        bob->radius = 4; // 设置粒子的半径为6像素
         bodies.push_back(bob); // 将新创建的粒子添加到粒子列表中
     }
     /*
