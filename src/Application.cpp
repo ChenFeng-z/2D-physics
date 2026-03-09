@@ -137,8 +137,11 @@ void Application::Update() {
         for (int j = i + 1; j < bodies.size(); j ++){
             Body* a = bodies[i];
             Body* b = bodies[j];
-            if (CollisionDecection::IsColliding(*a, *b)){
-                
+            a -> isColliding = false;
+            b -> isColliding = false;
+            if (CollisionDecection::IsColliding(a, b)){
+                a -> isColliding = true;
+                b -> isColliding = true;
 
             }
         }
@@ -175,9 +178,11 @@ void Application::Render() {
     
 
     for (auto body : bodies) {
+        Uint32 color = body->isColliding ? 0xFFFF00FF : 0xFFFFFFFF; // 如果粒子正在碰撞，使用红色，否则使用黄色
+
         if (body->shape->GetType() == CIRCLE) {
             CircleShape* circleShape = (CircleShape*)body->shape; // 将粒子的形状转换为CircleShape类型，以便访问半径属性
-            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation,0xFFEEBB00); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
+            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation,color); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
         }
         if (body->shape->GetType() == BOX) {
             BoxShape* boxShape = (BoxShape*)body->shape; // 将粒子的形状转换为BoxShape类型，以便访问宽度和高度属性

@@ -5,10 +5,10 @@
 
 struct CollisionDecection
 {
-    static bool IsColliding(Body& a, Body& b);
-    static bool IsCollidingCircleCircle(Body& a, Body& b);
-    static bool IscollidingPolygonPolygon(Body& a, Body& b);
-    static bool IscollidingPolygonCircle(Body& a, Body& b);
+    static bool IsColliding(Body* a, Body* b);
+    static bool IsCollidingCircleCircle(Body* a, Body* b);
+    static bool IscollidingPolygonPolygon(Body* a, Body* b);
+    static bool IscollidingPolygonCircle(Body* a, Body* b);
 };
 
 #endif
