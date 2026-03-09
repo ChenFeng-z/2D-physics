@@ -44,10 +44,12 @@ void Application::Input() {
                     running = false;
                 }
                 break;
-            case SDL_MOUSEMOTION:
+            case SDL_MOUSEBUTTONDOWN:
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                bodies[0]->position = Vec2(x, y);
+                Body* smallBall = new Body(CircleShape(40), x, y, 1.0);
+                smallBall->restitution = 0.9;
+                bodies.push_back(smallBall);
                 break;
         }
     }         
@@ -77,13 +79,13 @@ void Application::Update() {
         //Vec2 drag = Force::GenerateDragForce(*body, 0.01); // 生成阻力，使用一个阻力系数（例如0.5）
         //body->AddForce(drag);
 
-        //Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
-        //body->AddForce(weight);
+        Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
+        body->AddForce(weight);
         //float torque = 20;
         //body -> AddTorque(torque);
 
-        //Vec2 wind = Vec2(20 * PIXELS_PER_METER, 0);
-        //body->AddForce(wind);
+        Vec2 wind = Vec2(2.0 * PIXELS_PER_METER, 0);
+        body->AddForce(wind);
     }
 
 
@@ -98,7 +100,8 @@ void Application::Update() {
             a -> isColliding = false;
             b -> isColliding = false;
             Contact contact;
-            if (CollisionDecection::IsColliding(a, b, contact)){
+            if (CollisionDetection::IsColliding(a, b, contact)){
+                contact.ResolveCollision();
                 Graphics::DrawFillCircle(contact.start.x, contact.start.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
                 Graphics::DrawFillCircle(contact.end.x, contact.end.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
                 Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15, contact.start.y + contact.normal.y * 15, 0xFFFF00FF); // 绘制一条红色线段，表示碰撞的接触点之间的连接

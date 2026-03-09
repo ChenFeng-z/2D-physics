@@ -16,6 +16,8 @@ struct Body
     float I;
     float invI;
 
+    float restitution;
+
     Vec2 sumForces;
     float sumTorque;
 
@@ -30,6 +32,7 @@ struct Body
 
     bool IsStatic() const;
 
+    void ApplyImpulse(const Vec2& j);
     void AddForce(const Vec2& force);
     void AddTorque(float torque);
     void ClearTorque();

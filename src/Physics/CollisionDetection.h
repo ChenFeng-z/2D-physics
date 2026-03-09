@@ -4,7 +4,7 @@
 #include "Contact.h"
 #include "Body.h"
 
-struct CollisionDecection
+struct CollisionDetection
 {
     static bool IsColliding(Body* a, Body* b, Contact& contact);
     static bool IsCollidingCircleCircle(Body* a, Body* b, Contact& contact);

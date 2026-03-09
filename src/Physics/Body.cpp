@@ -12,6 +12,7 @@ Body::Body(const Shape& shape, float x, float y, float mass) {
     this->angularAcceleration = 0.0f;
     this->sumForces = Vec2(0, 0);
     this->sumTorque = 0.0f;
+    this->restitution = 1.0;
     this->mass = mass;
     this->inverseMass = (mass != 0) ? 1.0f / mass : 0.0f; // 计算质量的倒数，避免除以零
     I = shape.GetMomentOfInertia() * mass; 
@@ -51,6 +52,13 @@ void Body::AddForce(const Vec2& force) {
 
 void Body::ClearTorque() {
     sumTorque = 0.0f; // 清空总力矩
+}
+
+void Body::ApplyImpulse(const Vec2& j){
+    if (IsStatic()){
+        return;
+    }
+    velocity += j * inverseMass;
 }
 
 void Body::ClearForces() {
