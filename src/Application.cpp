@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "./Physics/Constants.h"
 #include "./Physics/force.h"
+#include "./Physics/CollisionDetection.h"
 
 bool Application::IsRunning() {
     return running;
@@ -14,8 +15,10 @@ void Application::Setup() {
 
     anchor = Vec2(Graphics::Width() / 2, 30);
 
-    Body* box = new Body(BoxShape(200, 100), Graphics::Width() / 2,Graphics::Height() / 2, 1.0); 
-    bodies.push_back(box); // 将新创建的粒子添加到粒子列表中
+    Body* bigBall = new Body(CircleShape(100), 100, 100, 1.0);
+    Body* smallBall = new Body(CircleShape(50), 500, 100, 1.0); 
+    bodies.push_back(bigBall); // 将新创建的粒子添加到粒子列表中
+    bodies.push_back(smallBall); // 将新创建的粒子添加到粒子列表中
     /*
     liquid.x = 0;
     liquid.y = Graphics::Height() / 2; // 将液体区域的y坐标设置为窗口高度的一半
@@ -116,15 +119,29 @@ void Application::Update() {
         //Vec2 drag = Force::GenerateDragForce(*body, 0.01); // 生成阻力，使用一个阻力系数（例如0.5）
         //body->AddForce(drag);
 
-        //Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
-        //body->AddForce(weight);
-        float torque = 20;
-        body -> AddTorque(torque);
+        Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
+        body->AddForce(weight);
+        //float torque = 20;
+        //body -> AddTorque(torque);
+
+        Vec2 wind = Vec2(20 * PIXELS_PER_METER, 0);
+        body->AddForce(wind);
     }
 
 
     for(auto body : bodies) {
         body -> Update(deltaTime);
+    }
+
+    for (int i = 0; i <= bodies.size() - 1; i++){
+        for (int j = i + 1; j < bodies.size(); j ++){
+            Body* a = bodies[i];
+            Body* b = bodies[j];
+            if (CollisionDecection::IsColliding(*a, *b)){
+                
+
+            }
+        }
     }
 
     for(auto body : bodies) {
