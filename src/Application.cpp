@@ -2,6 +2,7 @@
 #include "./Physics/Constants.h"
 #include "./Physics/force.h"
 #include "./Physics/CollisionDetection.h"
+#include "./Physics/Contact.h"
 
 bool Application::IsRunning() {
     return running;
@@ -39,61 +40,17 @@ void Application::Input() {
                 running = false;
                 break;
             case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_ESCAPE)
+                if (event.key.keysym.sym == SDLK_ESCAPE) {
                     running = false;
-                if (event.key.keysym.sym == SDLK_UP)
-                    pushForce.y = - 50 * PIXELS_PER_METER; // 按下向上箭头键时，设置推力向量的y分量为一个负值，表示向上的推力
-                if (event.key.keysym.sym == SDLK_DOWN)
-                    pushForce.y = 50 * PIXELS_PER_METER; // 按下向下箭头键时，设置推力向量的y分量为一个正值，表示向下的推力
-                if (event.key.keysym.sym == SDLK_LEFT)
-                    pushForce.x = - 50 * PIXELS_PER_METER; // 按下向左箭头键时，设置推力向量的x分量为一个负值，表示向左的推力
-                if (event.key.keysym.sym == SDLK_RIGHT)
-                    pushForce.x = 50 * PIXELS_PER_METER; // 按下向右箭头键时，设置推力向量的x分量为一个正值，表示向右的推力
-                break;
-            case SDL_KEYUP:
-                if (event.key.keysym.sym == SDLK_UP)
-                    pushForce.y = 0; // 松开向上箭头键时，设置推力向量的y分量为零，表示没有垂直方向的推力
-                if (event.key.keysym.sym == SDLK_DOWN)
-                    pushForce.y = 0; // 松开向下箭头键时，设置推力向量的y分量为零，表示没有垂直方向的推力
-                if (event.key.keysym.sym == SDLK_LEFT)
-                    pushForce.x = 0; // 松开向左箭头键时，设置推力向量的x分量为零，表示没有水平方向的推力
-                if (event.key.keysym.sym == SDLK_RIGHT)
-                    pushForce.x = 0; // 松开向右箭头键时，设置推力向量的x分量为零，表示没有水平方向的推力
-                break;
-            /*
-                case SDL_MOUSEBUTTONDOWN:
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    int x,y;
-                    SDL_GetMouseState(&x, &y); // 获取鼠标点击的位置坐标
-                    Body* newBody = new Body(x, y, 1.0); // 创建一个新的粒子对象，初始位置为鼠标点击的位置，质量为1
-                    newBody->radius = 5; // 设置粒子的半径为5像素
-                    bodies.push_back(newBody); // 将新创建的粒子添加到粒子列表中
                 }
-            */
+                break;
             case SDL_MOUSEMOTION:
-                mouseCursor.x = event.motion.x; // 更新鼠标光标的x坐标
-                mouseCursor.y = event.motion.y; // 更新鼠标光标的y坐标
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                if (!leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT) {
-                    leftMouseButtonDown = true; // 设置左键按下的状态为true
-                    int x, y;
-                    SDL_GetMouseState(&x, &y); // 获取鼠标点击的位置坐标
-                    mouseCursor.x = x; // 更新鼠标光标的x坐标
-                    mouseCursor.y = y; // 更新鼠标光标的y坐标
-                }
-                break;
-            case SDL_MOUSEBUTTONUP:
-                if (leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT) {
-                    leftMouseButtonDown = false; // 设置左键按下的状态为false
-                    int lastBody = NUM_PARTICLES - 1; // 获取最后一个粒子的索引
-                    Vec2 impulseDirection = (bodies[lastBody] -> position - mouseCursor).UnitVector();
-                    float impluseMagnitude = (bodies[lastBody] -> position - mouseCursor).Magnitude() *  5.0; // 根据鼠标点击位置与粒子位置的距离计算冲量的大小，乘以一个系数（例如10）来调整冲量的强度
-                    bodies[lastBody] -> velocity += impulseDirection * impluseMagnitude; // 将计算得到的冲量应用于粒子的速度，改变粒子的运动状态
-        }
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                bodies[0]->position = Vec2(x, y);
                 break;
         }
-    }
+    }         
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,6 +58,7 @@ void Application::Input() {
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Update() {
     // TODO: update all objects in the scene
+    Graphics::ClearScreen(0xFF056263);  // 清屏，使用指定的颜色（十六进制ARGB格式）
     static int timePreviousFrame;
     int timeToWait = MILLISECS_PER_FRAME - (SDL_GetTicks() - timePreviousFrame);
     if (timeToWait > 0) {
@@ -119,13 +77,13 @@ void Application::Update() {
         //Vec2 drag = Force::GenerateDragForce(*body, 0.01); // 生成阻力，使用一个阻力系数（例如0.5）
         //body->AddForce(drag);
 
-        Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
-        body->AddForce(weight);
+        //Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
+        //body->AddForce(weight);
         //float torque = 20;
         //body -> AddTorque(torque);
 
-        Vec2 wind = Vec2(20 * PIXELS_PER_METER, 0);
-        body->AddForce(wind);
+        //Vec2 wind = Vec2(20 * PIXELS_PER_METER, 0);
+        //body->AddForce(wind);
     }
 
 
@@ -139,7 +97,11 @@ void Application::Update() {
             Body* b = bodies[j];
             a -> isColliding = false;
             b -> isColliding = false;
-            if (CollisionDecection::IsColliding(a, b)){
+            Contact contact;
+            if (CollisionDecection::IsColliding(a, b, contact)){
+                Graphics::DrawFillCircle(contact.start.x, contact.start.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
+                Graphics::DrawFillCircle(contact.end.x, contact.end.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
+                Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15, contact.start.y + contact.normal.y * 15, 0xFFFF00FF); // 绘制一条红色线段，表示碰撞的接触点之间的连接
                 a -> isColliding = true;
                 b -> isColliding = true;
 
@@ -173,7 +135,7 @@ void Application::Update() {
 // Render function (called several times per second to draw objects)
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Render() {
-    Graphics::ClearScreen(0xFF056263);  // 清屏，使用指定的颜色（十六进制ARGB格式）
+    
     //Graphics::DrawFillRect(liquid.x + liquid.w / 2, liquid.y + liquid.h / 2, liquid.w, liquid.h, 0xFF0B3C4D); // 绘制一个填充的矩形，表示液体区域，使用指定的颜色（十六进制ARGB格式）
     
 
