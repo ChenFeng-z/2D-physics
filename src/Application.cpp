@@ -118,15 +118,19 @@ void Application::Update() {
 
         //Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
         //body->AddForce(weight);
-        //float torque = 20;
-        //body -> AddTorque(torque);
+        float torque = 20;
+        body -> AddTorque(torque);
     }
 
 
     for(auto body : bodies) {
         body->IntegrateLinear(deltaTime); // 更新粒子的位置和速度
         body->IntegrateAngular(deltaTime); // 更新粒子的旋转角度和角速度
-
+        bool isPolygon = body->shape->GetType() == POLYGON || body->shape->GetType() == BOX;
+        if (isPolygon) {
+            PolygonShape* polygonShape = (PolygonShape*)body->shape;
+            polygonShape->UpdateVertices(body->rotation, body->position); 
+        } 
     }
 
     for(auto body : bodies) {
@@ -166,7 +170,7 @@ void Application::Render() {
         }
         if (body->shape->GetType() == BOX) {
             BoxShape* boxShape = (BoxShape*)body->shape; // 将粒子的形状转换为BoxShape类型，以便访问宽度和高度属性
-            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->vertices, 0xFFEEBB00); // 在窗口中绘制一个填充的白色矩形，矩形中心坐标为粒子的位置，宽度和高度为粒子的宽度和高度
+            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFFEEBB00); // 在窗口中绘制一个填充的白色矩形，矩形中心坐标为粒子的位置，宽度和高度为粒子的宽度和高度
         }
         
         
