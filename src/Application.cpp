@@ -124,13 +124,7 @@ void Application::Update() {
 
 
     for(auto body : bodies) {
-        body->IntegrateLinear(deltaTime); // 更新粒子的位置和速度
-        body->IntegrateAngular(deltaTime); // 更新粒子的旋转角度和角速度
-        bool isPolygon = body->shape->GetType() == POLYGON || body->shape->GetType() == BOX;
-        if (isPolygon) {
-            PolygonShape* polygonShape = (PolygonShape*)body->shape;
-            polygonShape->UpdateVertices(body->rotation, body->position); 
-        } 
+        body -> Update(deltaTime);
     }
 
     for(auto body : bodies) {

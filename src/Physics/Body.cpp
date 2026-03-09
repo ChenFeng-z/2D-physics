@@ -56,3 +56,13 @@ void Body::IntegrateAngular(float dt) {
 
     ClearTorque(); // 在每次积分后清空总力矩，以便下一次计算
 }
+
+void Body::Update(float dt) {
+    IntegrateLinear(dt); // 更新粒子的位置和速度
+    IntegrateAngular(dt); // 更新粒子的旋转角度和角速度
+    bool isPolygon = shape->GetType() == POLYGON || shape->GetType() == BOX;
+    if (isPolygon) {
+        PolygonShape* polygonShape = (PolygonShape*) shape;
+        polygonShape->UpdateVertices(rotation, position); 
+    } 
+}
