@@ -1,5 +1,6 @@
 #include "body.h"
 #include <iostream>
+#include <math.h>
 
 Body::Body(const Shape& shape, float x, float y, float mass) {
     this->shape = shape.Clone(); 
@@ -23,7 +24,15 @@ Body ::~Body() {
     std::cout << "Body destructor called!" << std::endl;
 }
 
+bool Body:: IsStatic() const{
+    const float epsilon = 0.005f;
+    return fabs(inverseMass - 0.0) < epsilon;
+}
+
 void Body::IntegrateLinear(float dt) {
+    if (IsStatic()){
+        return;
+    }
     acceleration = sumForces * inverseMass; // 根据牛顿第二定律计算加速度
 
     velocity += acceleration * dt; // 更新粒子的速度，根据加速度和时间差计算新的速度
@@ -49,6 +58,9 @@ void Body::ClearForces() {
 }
 
 void Body::IntegrateAngular(float dt) {
+    if (IsStatic()){
+        return;
+    }
     angularAcceleration = sumTorque * invI; // 根据牛顿第二定律计算角加速度
 
     angularVelocity += angularAcceleration * dt; // 更新粒子的角速度，根据角加速度和时间差计算新的角速度

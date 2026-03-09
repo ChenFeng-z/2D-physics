@@ -16,10 +16,10 @@ void Application::Setup() {
 
     anchor = Vec2(Graphics::Width() / 2, 30);
 
-    Body* bigBall = new Body(CircleShape(100), 100, 100, 1.0);
-    Body* smallBall = new Body(CircleShape(50), 500, 100, 1.0); 
+    Body* bigBall = new Body(CircleShape(200), Graphics::Width() / 2, Graphics::Height() / 2, 0.0);
+     
     bodies.push_back(bigBall); // 将新创建的粒子添加到粒子列表中
-    bodies.push_back(smallBall); // 将新创建的粒子添加到粒子列表中
+   
     /*
     liquid.x = 0;
     liquid.y = Graphics::Height() / 2; // 将液体区域的y坐标设置为窗口高度的一半
