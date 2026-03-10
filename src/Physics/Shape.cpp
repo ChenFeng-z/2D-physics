@@ -1,6 +1,7 @@
 #include "Shape.h"
 #include <iostream>
 #include <vector>
+#include <limits>
 
 CircleShape::CircleShape(const float radius) {
     this->radius = radius;
@@ -56,6 +57,25 @@ void PolygonShape::UpdateVertices(float angle, const Vec2& position) {
         worldVertices[i] = localVertices[i].Rotate(angle);
         worldVertices[i] += position;
     }
+}
+
+float PolygonShape::FindMinSeparation(const PolygonShape* other) const{
+    float separation = std::numeric_limits<float>::lowest();
+
+    for (int i = 0; i < this->worldVertices.size(); i++){
+        Vec2 va = this->worldVertices[i];
+        Vec2 normal = this->EdgeAt(i).Normal();
+
+        float minSep = std::numeric_limits<float>::max();
+
+        for (int j = 0; j < other->worldVertices.size(); j++){
+            Vec2 vb = other->worldVertices[j];
+            minSep = std::min(minSep, (vb - va).Dot(normal));
+        }
+
+        separation = std::max(separation,minSep);
+    }
+    return separation;
 }
 
 BoxShape::BoxShape(const float width, const float height) {

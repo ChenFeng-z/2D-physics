@@ -41,6 +41,7 @@ struct PolygonShape : public Shape {
     float GetMomentOfInertia() const override;
     void UpdateVertices(float angle, const Vec2& position);
     Vec2 EdgeAt(int index) const;
+    float FindMinSeparation(const PolygonShape* other) const;
 };
 
 struct BoxShape:public PolygonShape{
