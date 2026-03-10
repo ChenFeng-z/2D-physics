@@ -40,6 +40,7 @@ struct PolygonShape : public Shape {
     Shape* Clone() const override;
     float GetMomentOfInertia() const override;
     void UpdateVertices(float angle, const Vec2& position);
+    Vec2 EdgeAt(int index) const;
 };
 
 struct BoxShape:public PolygonShape{

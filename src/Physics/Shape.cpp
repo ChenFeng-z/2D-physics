@@ -44,6 +44,12 @@ float PolygonShape::GetMomentOfInertia() const {
     return 0.0f; // 这里暂时返回0，实际实现需要根据多边形的形状进行计算
 }
 
+Vec2 PolygonShape::EdgeAt(int index) const{
+    int currVertex = index;
+    int nextVertex = (index + 1) % worldVertices.size();
+    return worldVertices[nextVertex] - worldVertices[currVertex];
+}
+
 void PolygonShape::UpdateVertices(float angle, const Vec2& position) {
     // 更新多边形的顶点位置，根据旋转角度和位置进行变换
     for (int i = 0; i < localVertices.size(); i++){
@@ -57,15 +63,15 @@ BoxShape::BoxShape(const float width, const float height) {
     this->height = height;
     
 
-    localVertices.push_back(Vec2(-width / 2, -height / 2)); // 左上角
-    localVertices.push_back(Vec2(width / 2, -height / 2)); // 右上角
-    localVertices.push_back(Vec2(width / 2, height / 2)); // 右下角
-    localVertices.push_back(Vec2(-width / 2, height / 2)); // 左下角
+    localVertices.push_back(Vec2(-width / 2, -height / 2)); 
+    localVertices.push_back(Vec2(-width / 2, height / 2)); 
+    localVertices.push_back(Vec2(width / 2, height / 2)); 
+    localVertices.push_back(Vec2(width / 2, -height / 2));
 
-    worldVertices.push_back(Vec2(-width / 2, -height / 2)); // 左上角
-    worldVertices.push_back(Vec2(width / 2, -height / 2)); // 右上角
-    worldVertices.push_back(Vec2(width / 2, height / 2)); // 右下角
-    worldVertices.push_back(Vec2(-width / 2, height / 2)); // 左下角
+    worldVertices.push_back(Vec2(-width / 2, -height / 2)); 
+    worldVertices.push_back(Vec2(-width / 2, height / 2)); 
+    worldVertices.push_back(Vec2(width / 2, height / 2)); 
+    worldVertices.push_back(Vec2(width / 2, -height / 2)); 
 }
 BoxShape::~BoxShape() {
 }
