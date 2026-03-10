@@ -3,9 +3,14 @@
 bool CollisionDetection::IsColliding(Body* a, Body* b, Contact& contact) {
     bool aIsCircle = a->shape->GetType() == CIRCLE;
     bool bIsCircle = b->shape->GetType() == CIRCLE;
+    bool aIsPolygon = a->shape->GetType() == POLYGON || a->shape->GetType() == BOX;
+    bool bIsPolygon = a->shape->GetType() == POLYGON || a->shape->GetType() == BOX;
 
     if (aIsCircle && bIsCircle){
         return IsCollidingCircleCircle(a, b ,contact);
+    }
+    if (aIsPolygon && bIsPolygon){
+        return IscollidingPolygonCircle(a, b, contact);
     }
     return false;
 }
@@ -33,4 +38,15 @@ bool CollisionDetection::IsCollidingCircleCircle(Body* a, Body* b, Contact& cont
 
     return true; // 如果发生碰撞，返回true
     
+}
+
+float FindMinSeparation(const PolygonShape& a, const PolygonShape& b){
+
+}
+
+bool CollisionDetection::IscollidingPolygonPolygon(Body* a, Body* b, Contact& contact){
+    const PolygonShape* aPolygonShape = (PolygonShape*) a -> shape;
+    const PolygonShape* bPolygonShape = (PolygonShape*) b -> shape;
+    //FindMinSeparation(aPolygonShape, bPolygonShape) <= 0;
+    //FindMinSeparation(bPolygonShape, aPolygonShape) <= 0;
 }

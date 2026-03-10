@@ -16,10 +16,13 @@ void Application::Setup() {
 
     anchor = Vec2(Graphics::Width() / 2, 30);
 
-    Body* bigBall = new Body(CircleShape(200), Graphics::Width() / 2, Graphics::Height() / 2, 0.0);
+    Body* boxA = new Body(BoxShape(200, 200), Graphics::Width() / 2, Graphics::Height() / 2, 1.0);
+    Body* boxB = new Body(BoxShape(200, 200), Graphics::Width() / 2, Graphics::Height() / 2, 1.0);
+    boxA->angularVelocity = 0.4;
+    boxB->angularVelocity = 0.1;
      
-    bodies.push_back(bigBall); // 将新创建的粒子添加到粒子列表中
-   
+    bodies.push_back(boxA); // 将新创建的粒子添加到粒子列表中
+    bodies.push_back(boxB);
     /*
     liquid.x = 0;
     liquid.y = Graphics::Height() / 2; // 将液体区域的y坐标设置为窗口高度的一半
@@ -44,12 +47,11 @@ void Application::Input() {
                     running = false;
                 }
                 break;
-            case SDL_MOUSEBUTTONDOWN:
+            case SDL_MOUSEMOTION:
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                Body* smallBall = new Body(CircleShape(40), x, y, 1.0);
-                smallBall->restitution = 0.9;
-                bodies.push_back(smallBall);
+                bodies[0]->position.x = x;
+                bodies[0]->position.y = y;
                 break;
         }
     }         
@@ -79,13 +81,13 @@ void Application::Update() {
         //Vec2 drag = Force::GenerateDragForce(*body, 0.01); // 生成阻力，使用一个阻力系数（例如0.5）
         //body->AddForce(drag);
 
-        Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
-        body->AddForce(weight);
+        //Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
+        //body->AddForce(weight);
         //float torque = 20;
         //body -> AddTorque(torque);
 
-        Vec2 wind = Vec2(2.0 * PIXELS_PER_METER, 0);
-        body->AddForce(wind);
+        //Vec2 wind = Vec2(2.0 * PIXELS_PER_METER, 0);
+        //body->AddForce(wind);
     }
 
 
@@ -101,7 +103,7 @@ void Application::Update() {
             b -> isColliding = false;
             Contact contact;
             if (CollisionDetection::IsColliding(a, b, contact)){
-                contact.ResolveCollision();
+                //contact.ResolveCollision();
                 Graphics::DrawFillCircle(contact.start.x, contact.start.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
                 Graphics::DrawFillCircle(contact.end.x, contact.end.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
                 Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15, contact.start.y + contact.normal.y * 15, 0xFFFF00FF); // 绘制一条红色线段，表示碰撞的接触点之间的连接
@@ -151,7 +153,7 @@ void Application::Render() {
         }
         if (body->shape->GetType() == BOX) {
             BoxShape* boxShape = (BoxShape*)body->shape; // 将粒子的形状转换为BoxShape类型，以便访问宽度和高度属性
-            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFFEEBB00); // 在窗口中绘制一个填充的白色矩形，矩形中心坐标为粒子的位置，宽度和高度为粒子的宽度和高度
+            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, color); // 在窗口中绘制一个填充的白色矩形，矩形中心坐标为粒子的位置，宽度和高度为粒子的宽度和高度
         }
         
         
