@@ -18,6 +18,7 @@ void Contact::ResolveCollision(){
     ResolvePenetration();
 
     float e = std::min(a->restitution, b->restitution);
+    float f = std::min(a->friction, b->friction);
 
     Vec2 ra = end - a->position;
     Vec2 rb = start - b->position;
@@ -27,12 +28,18 @@ void Contact::ResolveCollision(){
     const Vec2 vrel = va - vb;
     
     float vrelDotNormal = vrel.Dot(normal);
-
     const Vec2 impulseDirection = normal;
     const float impulseMagnitude = -(1 + e) * vrelDotNormal / ((a -> inverseMass + b -> inverseMass) + ra.Cross(normal)*ra.Cross(normal)*a->invI + rb.Cross(normal)*rb.Cross(normal)*b->invI);
+    Vec2 jN = impulseDirection * impulseMagnitude;
 
-    Vec2 jn = impulseDirection * impulseMagnitude;
+    Vec2 tangent = normal.Normal();
+    float vrelDotTangent = vrel.Dot(tangent);
+    const Vec2 impulseDirectionT = tangent;
+    const float impulseMagnitudeT = f * -(1 + e) * vrelDotTangent / ((a -> inverseMass + b -> inverseMass) + ra.Cross(tangent)*ra.Cross(tangent)*a->invI + rb.Cross(tangent)*rb.Cross(tangent)*b->invI);
+    Vec2 jT = impulseDirectionT * impulseMagnitudeT;
 
-    a -> ApplyImpulse(jn, ra);
-    b -> ApplyImpulse(-jn, rb);
+    Vec2 j = jN + jT;
+
+    a -> ApplyImpulse(j, ra);
+    b -> ApplyImpulse(-j, rb);
 }

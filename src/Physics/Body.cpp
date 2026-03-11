@@ -13,6 +13,7 @@ Body::Body(const Shape& shape, float x, float y, float mass) {
     this->sumForces = Vec2(0, 0);
     this->sumTorque = 0.0f;
     this->restitution = 1.0;
+    this->friction = 0.7;
     this->mass = mass;
     this->inverseMass = (mass != 0) ? 1.0f / mass : 0.0f; // 计算质量的倒数，避免除以零
     I = shape.GetMomentOfInertia() * mass; 
