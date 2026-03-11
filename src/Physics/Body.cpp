@@ -61,6 +61,14 @@ void Body::ApplyImpulse(const Vec2& j){
     velocity += j * inverseMass;
 }
 
+void Body::ApplyImpulse(const Vec2& j, const Vec2& r){
+    if (IsStatic()){
+        return;
+    }
+    velocity += j * inverseMass;
+    angularVelocity += r.Cross(j) * invI;
+}
+
 void Body::ClearForces() {
     sumForces = Vec2(0, 0); // 清空总力
 }
