@@ -2,6 +2,7 @@
 #include <iostream>
 #include <math.h>
 #include "Shape.h"
+#include "../Graphics.h"
 
 bool CollisionDetection::IsColliding(Body* a, Body* b, Contact& contact) {
     bool aIsCircle = a->shape->GetType() == CIRCLE;
@@ -81,5 +82,29 @@ bool CollisionDetection::IsCollidingPolygonPolygon(Body* a, Body* b, Contact& co
 }
 
 bool CollisionDetection::IsCollidingPolygonCircle(Body* polygon, Body* circle, Contact& contact){
+    const PolygonShape* polygonShape = (PolygonShape*) polygon -> shape;
+    const std::vector<Vec2>& polygonVertices = polygonShape->worldVertices; 
 
+    Vec2 minCurrVertex;
+    Vec2 minNextVertex;
+    for (int i = 0; i < polygonVertices.size(); i++){
+        int currVertex = i;
+        int nextVertex = (i + 1) % polygonVertices.size();
+        Vec2 edge = polygonShape->EdgeAt(currVertex);
+        Vec2 normal = edge.Normal();
+
+        Vec2 circleCenter = circle->position - polygonVertices[currVertex];
+
+        float projection = circleCenter.Dot(normal);
+
+        if (projection > 0){
+
+            minCurrVertex = polygonShape->worldVertices[currVertex];
+            minNextVertex = polygonShape->worldVertices[nextVertex];
+            break;
+        }
+    }
+    Graphics::DrawFillCircle(minCurrVertex.x, minCurrVertex.y, 5, 0xFF00FFFF);
+    Graphics::DrawFillCircle(minNextVertex.x, minNextVertex.y, 5, 0xFF00FFFF);
+    return false;
 }
