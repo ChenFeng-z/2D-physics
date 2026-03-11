@@ -25,10 +25,15 @@ float CircleShape::GetMomentOfInertia() const {
 }
 
 PolygonShape::PolygonShape(const std::vector<Vec2>& vertices) {
-    
+    for (auto vertex : vertices){
+        localVertices.push_back(vertex);
+        worldVertices.push_back(vertex);
+    }
+    std::cout << "PolygonShape constructor called!" << std::endl;
 }
 
 PolygonShape::~PolygonShape() {
+    std::cout << "PolygonShape destructor called!" << std::endl;
 }
 
 ShapeType PolygonShape::GetType() const {

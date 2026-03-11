@@ -149,6 +149,10 @@ void Application::Render() {
             BoxShape* boxShape = (BoxShape*)body->shape; // 将粒子的形状转换为BoxShape类型，以便访问宽度和高度属性
             Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFF00FF00); // 在窗口中绘制一个填充的白色矩形，矩形中心坐标为粒子的位置，宽度和高度为粒子的宽度和高度
         }
+        if (body->shape->GetType() == POLYGON){
+            PolygonShape* polygonShape = (PolygonShape*) body->shape;
+            Graphics::DrawPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF00FF00);
+        }
         
         
     }
