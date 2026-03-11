@@ -14,8 +14,6 @@ bool Application::IsRunning() {
 void Application::Setup() {
     running = Graphics::OpenWindow();  // 系统调用，通过Graphics类打开窗口并返回是否成功打开的结果
 
-    anchor = Vec2(Graphics::Width() / 2, 30);
-
     Body* floor = new Body(BoxShape(Graphics::Width() - 50, 50), Graphics::Width() / 2, Graphics::Height() - 50, 0.0);
     Body* leftWall = new Body(BoxShape(50, Graphics::Height() - 100), 50, Graphics::Height() / 2.0 - 25, 0.0);
     Body* rightWall = new Body(BoxShape(50, Graphics::Height() - 100), Graphics::Width() - 50, Graphics::Height() / 2.0 - 25, 0.0);
@@ -54,9 +52,10 @@ void Application::Input() {
                 running = false;
                 break;
             case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_ESCAPE) {
+                if (event.key.keysym.sym == SDLK_ESCAPE) 
                     running = false;
-                }
+                if (event.key.keysym.sym == SDLK_d)
+                    debug = !debug;
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 int x, y;
@@ -117,12 +116,14 @@ void Application::Update() {
             Contact contact;
             if (CollisionDetection::IsColliding(a, b, contact)){
                 contact.ResolveCollision();
-                Graphics::DrawFillCircle(contact.start.x, contact.start.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
-                Graphics::DrawFillCircle(contact.end.x, contact.end.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
-                Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15, contact.start.y + contact.normal.y * 15, 0xFFFF00FF); // 绘制一条红色线段，表示碰撞的接触点之间的连接
-                a -> isColliding = true;
-                b -> isColliding = true;
 
+                if (debug){
+                    Graphics::DrawFillCircle(contact.start.x, contact.start.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
+                    Graphics::DrawFillCircle(contact.end.x, contact.end.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
+                    Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15, contact.start.y + contact.normal.y * 15, 0xFFFF00FF); // 绘制一条红色线段，表示碰撞的接触点之间的连接
+                    a -> isColliding = true;
+                    b -> isColliding = true;
+                }
             }
         }
     }
@@ -139,15 +140,14 @@ void Application::Render() {
     
 
     for (auto body : bodies) {
-        Uint32 color = body->isColliding ? 0xFFFF00FF : 0xFFFFFFFF; // 如果粒子正在碰撞，使用红色，否则使用黄色
 
         if (body->shape->GetType() == CIRCLE) {
             CircleShape* circleShape = (CircleShape*)body->shape; // 将粒子的形状转换为CircleShape类型，以便访问半径属性
-            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation,color); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
+            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation,0xFF00FF00); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
         }
         if (body->shape->GetType() == BOX) {
             BoxShape* boxShape = (BoxShape*)body->shape; // 将粒子的形状转换为BoxShape类型，以便访问宽度和高度属性
-            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, color); // 在窗口中绘制一个填充的白色矩形，矩形中心坐标为粒子的位置，宽度和高度为粒子的宽度和高度
+            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFF00FF00); // 在窗口中绘制一个填充的白色矩形，矩形中心坐标为粒子的位置，宽度和高度为粒子的宽度和高度
         }
         
         

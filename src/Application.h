@@ -7,17 +7,9 @@
 
 class Application {
     private:
+        bool debug = false;
         bool running = false;
         std::vector<Body*> bodies; // 存储所有粒子的容器
-        Vec2 pushForce = Vec2(0, 0); // 定义一个推力向量，初始值为零
-        Vec2 mouseCursor; // 定义一个向量，表示鼠标光标的位置
-        bool leftMouseButtonDown = false; // 定义一个布尔变量，表示左键是否按下
-        SDL_Rect liquid; // 定义一个矩形，表示液体区域
-
-        Vec2 anchor = Vec2(0,0);
-        float k = 50;
-        float restLength = 15;
-        const int NUM_PARTICLES = 5;
 
     public:
         Application() = default;
