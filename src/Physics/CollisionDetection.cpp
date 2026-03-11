@@ -83,10 +83,13 @@ bool CollisionDetection::IsCollidingPolygonPolygon(Body* a, Body* b, Contact& co
 
 bool CollisionDetection::IsCollidingPolygonCircle(Body* polygon, Body* circle, Contact& contact){
     const PolygonShape* polygonShape = (PolygonShape*) polygon -> shape;
+    const CircleShape* circleShape = (CircleShape*) circle->shape;
     const std::vector<Vec2>& polygonVertices = polygonShape->worldVertices; 
 
+    bool isOutside = false;
     Vec2 minCurrVertex;
     Vec2 minNextVertex;
+    float distanceCircleEdge = std::numeric_limits<float>::lowest();
     for (int i = 0; i < polygonVertices.size(); i++){
         int currVertex = i;
         int nextVertex = (i + 1) % polygonVertices.size();
@@ -98,13 +101,74 @@ bool CollisionDetection::IsCollidingPolygonCircle(Body* polygon, Body* circle, C
         float projection = circleCenter.Dot(normal);
 
         if (projection > 0){
-
+            //说明圆心在外面
+            distanceCircleEdge = projection;
             minCurrVertex = polygonShape->worldVertices[currVertex];
             minNextVertex = polygonShape->worldVertices[nextVertex];
+            isOutside = true;
             break;
+        } else{
+            if (projection > distanceCircleEdge){
+                distanceCircleEdge = projection;
+                minCurrVertex = polygonShape->worldVertices[currVertex];
+                minNextVertex = polygonShape->worldVertices[nextVertex];
+            }
         }
     }
-    Graphics::DrawFillCircle(minCurrVertex.x, minCurrVertex.y, 5, 0xFF00FFFF);
-    Graphics::DrawFillCircle(minNextVertex.x, minNextVertex.y, 5, 0xFF00FFFF);
-    return false;
+    if (isOutside){
+        //检查在abc哪个区域
+        Vec2 v1 = circle->position - minCurrVertex;
+        Vec2 v2 = minNextVertex - minCurrVertex;
+        if (v1.Dot(v2) < 0){
+            if (v1.Magnitude() > circleShape->radius){
+                return false;
+            }else{
+                // 区域A
+                contact.a = polygon;
+                contact.b = circle;
+                contact.depth = circleShape->radius - v1.Magnitude();
+                contact.normal = v1.Normalized();
+                contact.start = circle->position + (contact.normal * -circleShape -> radius);
+                contact.end = contact.start + (contact.normal * contact.depth);
+            }
+        }else{
+            //区域B
+            v1 = circle->position - minNextVertex;
+            v2 = minCurrVertex - minNextVertex;
+            if (v1.Dot(v2)){
+                if (v1.Magnitude() > circleShape->radius){
+                    return false;
+                }else{
+                    contact.a = polygon;
+                    contact.b = circle;
+                    contact.depth = circleShape->radius - v1.Magnitude();
+                    contact.normal = v1.Normalized();
+                    contact.start = circle->position + (contact.normal * -circleShape -> radius);
+                    contact.end = contact.start + (contact.normal * contact.depth);
+                }
+            }else{
+                //区域C
+                if (distanceCircleEdge > circleShape -> radius){
+                    return false;
+                }else {
+                    contact.a = polygon;
+                    contact.b = circle;
+                    contact.depth = circleShape->radius - distanceCircleEdge;
+                    contact.normal = (minNextVertex - minCurrVertex).Normal();
+                    contact.start = circle->position - (contact.normal*circleShape->radius);
+                    contact.end = contact.start + (contact.normal * contact.depth);
+                }
+            }
+        }
+    }else{
+        //球完全在多边形内
+        contact.a = polygon;
+        contact.b = circle;
+        contact.depth = circleShape->radius - distanceCircleEdge;
+        contact.normal = (minNextVertex - minCurrVertex).Normal();
+        contact.start = circle->position - (contact.normal * circleShape->radius);
+        contact.end = contact.start + (contact.normal * contact.depth);
+    }
+    
+    return true;
 }
