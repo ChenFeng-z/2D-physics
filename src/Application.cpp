@@ -19,15 +19,15 @@ void Application::Setup() {
     Body* floor = new Body(BoxShape(Graphics::Width() - 50, 50), Graphics::Width() / 2, Graphics::Height() - 50, 0.0);
     Body* leftWall = new Body(BoxShape(50, Graphics::Height() - 100), 50, Graphics::Height() / 2.0 - 25, 0.0);
     Body* rightWall = new Body(BoxShape(50, Graphics::Height() - 100), Graphics::Width() - 50, Graphics::Height() / 2.0 - 25, 0.0);
-    floor -> restitution = 0.2;
+    floor -> restitution = 0.5;
     leftWall -> restitution = 0.2;
     rightWall -> restitution = 0.2;
-    //bodies.push_back(floor);
-    //bodies.push_back(leftWall);
-    //bodies.push_back(rightWall);
+    bodies.push_back(floor);
+    bodies.push_back(leftWall);
+    bodies.push_back(rightWall);
     Body* bigBox = new Body(BoxShape(200, 200), Graphics::Width() / 2, Graphics::Height() / 2, 0.0);
     bigBox->rotation = 1.4;
-    bigBox->restitution = 0.5;
+    bigBox->restitution = 0.7;
     bodies.push_back(bigBox); 
     
     Body* ball = new Body(CircleShape(50), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 1.0);
@@ -61,8 +61,10 @@ void Application::Input() {
             case SDL_MOUSEBUTTONDOWN:
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                bodies[1]->position.x = x;
-                bodies[1]->position.y = y;
+                Body* ball = new Body(CircleShape(30), x, y, 1.0);
+                ball -> restitution = 0.5;
+                ball -> friction = 0.4;
+                bodies.push_back(ball);
                 break;
         }
     }         
@@ -92,8 +94,8 @@ void Application::Update() {
         //Vec2 drag = Force::GenerateDragForce(*body, 0.01); // 生成阻力，使用一个阻力系数（例如0.5）
         //body->AddForce(drag);
 
-        //Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
-        //body->AddForce(weight);
+        Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
+        body->AddForce(weight);
         //float torque = 20;
         //body -> AddTorque(torque);
 
@@ -114,7 +116,7 @@ void Application::Update() {
             b -> isColliding = false;
             Contact contact;
             if (CollisionDetection::IsColliding(a, b, contact)){
-                //contact.ResolveCollision();
+                contact.ResolveCollision();
                 Graphics::DrawFillCircle(contact.start.x, contact.start.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
                 Graphics::DrawFillCircle(contact.end.x, contact.end.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
                 Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15, contact.start.y + contact.normal.y * 15, 0xFFFF00FF); // 绘制一条红色线段，表示碰撞的接触点之间的连接

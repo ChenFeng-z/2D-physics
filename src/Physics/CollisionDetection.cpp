@@ -106,7 +106,7 @@ bool CollisionDetection::IsCollidingPolygonCircle(Body* polygon, Body* circle, C
             minCurrVertex = polygonShape->worldVertices[currVertex];
             minNextVertex = polygonShape->worldVertices[nextVertex];
             isOutside = true;
-            break;
+            
         } else{
             if (projection > distanceCircleEdge){
                 distanceCircleEdge = projection;
@@ -135,7 +135,7 @@ bool CollisionDetection::IsCollidingPolygonCircle(Body* polygon, Body* circle, C
             //区域B
             v1 = circle->position - minNextVertex;
             v2 = minCurrVertex - minNextVertex;
-            if (v1.Dot(v2)){
+            if (v1.Dot(v2) < 0){
                 if (v1.Magnitude() > circleShape->radius){
                     return false;
                 }else{
@@ -161,7 +161,7 @@ bool CollisionDetection::IsCollidingPolygonCircle(Body* polygon, Body* circle, C
             }
         }
     }else{
-        //球完全在多边形内
+        //圆心在多边形里面
         contact.a = polygon;
         contact.b = circle;
         contact.depth = circleShape->radius - distanceCircleEdge;
