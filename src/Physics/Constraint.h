@@ -3,6 +3,7 @@
 
 #include "Body.h"
 #include "VecN.h"
+#include "MatMN.h"
 
 class Constraint {
     public:

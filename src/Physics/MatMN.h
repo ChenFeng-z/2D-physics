@@ -16,7 +16,7 @@ struct MatMN{
     void Zero();
     MatMN Transpose() const;
 
-    const MatMN operator = (const MatMN& m);
+    const MatMN& operator = (const MatMN& m);
     VecN operator * (const VecN& v) const;
     MatMN operator * (const MatMN& m) const;
 
