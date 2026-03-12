@@ -1,6 +1,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include "./Physics/World.h"
 #include "./Graphics.h"
 #include "./Physics/Body.h"
 #include <vector>
@@ -9,7 +10,7 @@ class Application {
     private:
         bool debug = false;
         bool running = false;
-        std::vector<Body*> bodies; // 存储所有粒子的容器
+        World* world;
 
     public:
         Application() = default;
