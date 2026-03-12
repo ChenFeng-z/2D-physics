@@ -2,6 +2,7 @@
 #define CONSTRAINT_H
 
 #include "Body.h"
+#include "VecN.h"
 
 class Constraint {
     public:
