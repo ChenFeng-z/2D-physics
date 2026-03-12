@@ -1,5 +1,5 @@
-#ifndef WORLD_H;
-#define WORLD_H;
+#ifndef WORLD_H
+#define WORLD_H
 
 #include "./Body.h"
 #include <vector>

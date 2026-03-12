@@ -49,8 +49,9 @@ void World::Update(float dt){
     for (auto body : bodies){
         body -> Update(dt);
     }
-    
-    CheckCollisions();
+    for (int n = 0; n < 10; n++){
+        CheckCollisions();
+    }
 }
 
 void World::CheckCollisions(){
