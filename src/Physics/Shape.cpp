@@ -20,6 +20,10 @@ Shape* CircleShape::Clone() const {
     return new CircleShape(radius); // 使用复制构造函数创建一个新的CircleShape对象，并返回其指针
 }
 
+void CircleShape::UpdateVertices(float angle, const Vec2& position) {
+    return;
+}
+
 float CircleShape::GetMomentOfInertia() const {
     return 0.5f * radius * radius; // 圆形的转动惯量公式 I = 0.5 * m * r^2，其中 m 是质量，r 是半径
 }
