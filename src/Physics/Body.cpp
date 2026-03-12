@@ -24,6 +24,7 @@ Body::Body(const Shape& shape, float x, float y, float mass) {
 
 Body ::~Body() {
     delete shape; // 释放shape对象的内存
+    SDL_DestroyTexture(texture);
     std::cout << "Body destructor called!" << std::endl;
 }
 

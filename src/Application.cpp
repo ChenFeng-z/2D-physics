@@ -61,20 +61,23 @@ void Application::Input() {
                     debug = !debug;
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                int x, y;
-                SDL_GetMouseState(&x, &y);
-                std::vector<Vec2> vertices = {
-                    Vec2(20, 60),   // 右下
-                    Vec2(40, 20),   // 右中
-                    Vec2(20, -60),  // 右上
-                    Vec2(-20, -60), // 左上
-                    Vec2(-40, 20)   // 左下
-                };
-                Body* poly = new Body(PolygonShape(vertices), x, y, 1.0);
-                poly -> restitution = 0.1;
-                poly -> friction = 0.7;
-                bodies.push_back(poly);
+                if (event.button.button == SDL_BUTTON_LEFT){
+                    int x,y;
+                    SDL_GetMouseState(&x, &y);
+                    Body* ball = new Body(CircleShape(30), x, y, 1.0);
+                    ball->SetTexture("./assets/basketball.png");
+                    ball->restitution = 0.5;
+                    bodies.push_back(ball);
+                }
+                if (event.button.button == SDL_BUTTON_RIGHT){
+                    int x,y;
+                    SDL_GetMouseState(&x, &y);
+                    Body* box = new Body(BoxShape(60, 60), x, y, 1.0);
+                    box->SetTexture("./assets/crate.png");
+                    box->restitution = 0.2;
+                    bodies.push_back(box);
                 break;
+                }
         }
     }         
 }
@@ -121,8 +124,6 @@ void Application::Update() {
         for (int j = i + 1; j < bodies.size(); j ++){
             Body* a = bodies[i];
             Body* b = bodies[j];
-            a -> isColliding = false;
-            b -> isColliding = false;
             Contact contact;
             if (CollisionDetection::IsColliding(a, b, contact)){
                 contact.ResolveCollision();
@@ -154,7 +155,7 @@ void Application::Render() {
         if (body->shape->GetType() == CIRCLE) {
             CircleShape* circleShape = (CircleShape*)body->shape; // 将粒子的形状转换为CircleShape类型，以便访问半径属性
             if (!debug && body->texture){
-                Graphics::DrawTexture(body->position.x, body->position.y, circleShape->radius,circleShape->radius, body->rotation, body->texture);
+                Graphics::DrawTexture(body->position.x, body->position.y, circleShape->radius * 2, circleShape->radius * 2,body->rotation, body->texture);
             }else{
                 Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation,0xFF00FF00);
             }
@@ -169,7 +170,11 @@ void Application::Render() {
         }
         if (body->shape->GetType() == POLYGON){
             PolygonShape* polygonShape = (PolygonShape*) body->shape;
-            Graphics::DrawPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF00FF00);
+            if (!debug && body->texture){
+                Graphics::DrawFillPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF00FF00);
+            }else{
+                Graphics::DrawPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF00FF00);
+            }
         }
         
         
