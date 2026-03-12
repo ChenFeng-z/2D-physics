@@ -18,12 +18,12 @@ class World{
         void AddBody(Body* body);
         std::vector<Body*>& GetBodies();
 
-        void Addforce(const Vec2& force);
+        void AddForce(const Vec2& force);
         void AddTorque(float torque);
 
         void Update(float dt);
 
         void CheckCollisions();
-}
+};
 
-#endif;
+#endif

@@ -3,6 +3,7 @@
 #include "./Physics/force.h"
 #include "./Physics/CollisionDetection.h"
 #include "./Physics/Contact.h"
+#include "./Physics/World.h"
 #include <vector>
 
 bool Application::IsRunning() {
@@ -15,25 +16,30 @@ bool Application::IsRunning() {
 void Application::Setup() {
     running = Graphics::OpenWindow();  // 系统调用，通过Graphics类打开窗口并返回是否成功打开的结果
 
+    world = new World(-9.8);
+
     Body* floor = new Body(BoxShape(Graphics::Width() - 50, 50), Graphics::Width() / 2, Graphics::Height() - 50, 0.0);
     Body* leftWall = new Body(BoxShape(50, Graphics::Height() - 100), 50, Graphics::Height() / 2.0 - 25, 0.0);
     Body* rightWall = new Body(BoxShape(50, Graphics::Height() - 100), Graphics::Width() - 50, Graphics::Height() / 2.0 - 25, 0.0);
     floor -> restitution = 0.5;
     leftWall -> restitution = 0.2;
     rightWall -> restitution = 0.2;
-    bodies.push_back(floor);
-    bodies.push_back(leftWall);
-    bodies.push_back(rightWall);
+    world->AddBody(floor);
+    world->AddBody(leftWall);
+    world->AddBody(rightWall);
     Body* bigBox = new Body(BoxShape(200, 200), Graphics::Width() / 2, Graphics::Height() / 2, 0.0);
     bigBox->SetTexture("./assets/crate.png");
     bigBox->rotation = 1.4;
     bigBox->restitution = 0.7;
-    bodies.push_back(bigBox); 
+    world->AddBody(bigBox); 
     
     Body* ball = new Body(CircleShape(50), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 1.0);
     ball->SetTexture("./assets/basketball.png");
     ball->restitution = 0.1;
-    bodies.push_back(ball);
+    world->AddBody(ball);
+
+    Vec2 wind = Vec2(0.5 * PIXELS_PER_METER, 0.0);
+    world -> AddForce(wind);
     
     /*
     liquid.x = 0;
@@ -67,7 +73,7 @@ void Application::Input() {
                     Body* ball = new Body(CircleShape(30), x, y, 1.0);
                     ball->SetTexture("./assets/basketball.png");
                     ball->restitution = 0.5;
-                    bodies.push_back(ball);
+                    world->AddBody(ball);
                 }
                 if (event.button.button == SDL_BUTTON_RIGHT){
                     int x,y;
@@ -75,7 +81,7 @@ void Application::Input() {
                     Body* box = new Body(BoxShape(60, 60), x, y, 1.0);
                     box->SetTexture("./assets/crate.png");
                     box->restitution = 0.2;
-                    bodies.push_back(box);
+                    world->AddBody(box);
                 break;
                 }
         }
@@ -100,44 +106,7 @@ void Application::Update() {
 
     timePreviousFrame = SDL_GetTicks();
     
-    for (auto body : bodies) {
-    
-        //body->AddForce(pushForce); // 将推力作用于粒子
-        //Vec2 drag = Force::GenerateDragForce(*body, 0.01); // 生成阻力，使用一个阻力系数（例如0.5）
-        //body->AddForce(drag);
-
-        Vec2 weight = Vec2(0, 9.8 * body->mass* PIXELS_PER_METER); //
-        body->AddForce(weight);
-        //float torque = 20;
-        //body -> AddTorque(torque);
-
-        //Vec2 wind = Vec2(2.0 * PIXELS_PER_METER, 0);
-        //body->AddForce(wind);
-    }
-
-
-    for(auto body : bodies) {
-        body -> Update(deltaTime);
-    }
-
-    for (int i = 0; i <= bodies.size() - 1; i++){
-        for (int j = i + 1; j < bodies.size(); j ++){
-            Body* a = bodies[i];
-            Body* b = bodies[j];
-            Contact contact;
-            if (CollisionDetection::IsColliding(a, b, contact)){
-                contact.ResolveCollision();
-
-                if (debug){
-                    Graphics::DrawFillCircle(contact.start.x, contact.start.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
-                    Graphics::DrawFillCircle(contact.end.x, contact.end.y, 5, 0xFFFF0000); // 在碰撞点绘制一个红色圆，表示碰撞发生的位置
-                    Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15, contact.start.y + contact.normal.y * 15, 0xFFFF00FF); // 绘制一条红色线段，表示碰撞的接触点之间的连接
-                    a -> isColliding = true;
-                    b -> isColliding = true;
-                }
-            }
-        }
-    }
+    world -> Update(deltaTime);
 
     
 }
@@ -150,7 +119,7 @@ void Application::Render() {
     //Graphics::DrawFillRect(liquid.x + liquid.w / 2, liquid.y + liquid.h / 2, liquid.w, liquid.h, 0xFF0B3C4D); // 绘制一个填充的矩形，表示液体区域，使用指定的颜色（十六进制ARGB格式）
     
 
-    for (auto body : bodies) {
+    for (auto body : world -> GetBodies()) {
 
         if (body->shape->GetType() == CIRCLE) {
             CircleShape* circleShape = (CircleShape*)body->shape; // 将粒子的形状转换为CircleShape类型，以便访问半径属性
@@ -193,8 +162,6 @@ void Application::Render() {
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Destroy() {
     // TODO: destroy all objects in the scene
-    for(auto body : bodies) {
-        delete body; // 释放粒子对象的内存
-    }
+    delete world;
     Graphics::CloseWindow();
 }
