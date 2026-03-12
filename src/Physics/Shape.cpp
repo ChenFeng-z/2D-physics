@@ -47,7 +47,7 @@ Shape* PolygonShape::Clone() const {
 float PolygonShape::GetMomentOfInertia() const {
     // 计算多边形的转动惯量，使用多边形的顶点信息进行计算
     // 这里可以使用多边形的面积和质心来计算转动惯量，或者使用其他方法
-    return 0.0f; // 这里暂时返回0，实际实现需要根据多边形的形状进行计算
+    return 5000; // 这里暂时返回0，实际实现需要根据多边形的形状进行计算
 }
 
 Vec2 PolygonShape::EdgeAt(int index) const{

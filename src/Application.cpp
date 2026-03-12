@@ -3,6 +3,7 @@
 #include "./Physics/force.h"
 #include "./Physics/CollisionDetection.h"
 #include "./Physics/Contact.h"
+#include <vector>
 
 bool Application::IsRunning() {
     return running;
@@ -60,10 +61,17 @@ void Application::Input() {
             case SDL_MOUSEBUTTONDOWN:
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                Body* ball = new Body(CircleShape(30), x, y, 1.0);
-                ball -> restitution = 0.5;
-                ball -> friction = 0.4;
-                bodies.push_back(ball);
+                std::vector<Vec2> vertices = {
+                    Vec2(20, 60),   // 右下
+                    Vec2(40, 20),   // 右中
+                    Vec2(20, -60),  // 右上
+                    Vec2(-20, -60), // 左上
+                    Vec2(-40, 20)   // 左下
+                };
+                Body* poly = new Body(PolygonShape(vertices), x, y, 1.0);
+                poly -> restitution = 0.1;
+                poly -> friction = 0.7;
+                bodies.push_back(poly);
                 break;
         }
     }         
