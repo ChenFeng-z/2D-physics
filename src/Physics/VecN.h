@@ -13,12 +13,13 @@ struct VecN {
     void Zero();
     float Dot(const VecN& v) const;
 
-    VecN operator + (const VecN& v);
-    VecN operator - (const VecN& v);
-    VecN operator * (const VecN& v);
+    VecN& operator = (const VecN& v); 
+    VecN operator + (const VecN& v) const;
+    VecN operator - (const VecN& v) const;
+    VecN operator * (float n) const;
     const VecN& operator += (const VecN& v);
     const VecN& operator -= (const VecN& v);
-    const VecN& operator *= (const VecN& v);
+    const VecN& operator *= (float n);
     float operator [] (const int index) const;  // v1[index]
     float& operator [] (const int index);
 };
