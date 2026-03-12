@@ -1,3 +1,4 @@
+#include "../Graphics.h"
 #include "body.h"
 #include <iostream>
 #include <math.h>
@@ -24,6 +25,14 @@ Body::Body(const Shape& shape, float x, float y, float mass) {
 Body ::~Body() {
     delete shape; // 释放shape对象的内存
     std::cout << "Body destructor called!" << std::endl;
+}
+
+void Body::SetTexture(const char* textureFileName){
+    SDL_Surface* surface = IMG_Load(textureFileName);
+    if (surface){
+        texture = SDL_CreateTextureFromSurface(Graphics::renderer, surface);
+        SDL_FreeSurface(surface);
+    }
 }
 
 bool Body:: IsStatic() const{

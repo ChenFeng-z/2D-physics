@@ -25,11 +25,13 @@ void Application::Setup() {
     bodies.push_back(leftWall);
     bodies.push_back(rightWall);
     Body* bigBox = new Body(BoxShape(200, 200), Graphics::Width() / 2, Graphics::Height() / 2, 0.0);
+    bigBox->SetTexture("./assets/crate.png");
     bigBox->rotation = 1.4;
     bigBox->restitution = 0.7;
     bodies.push_back(bigBox); 
     
     Body* ball = new Body(CircleShape(50), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 1.0);
+    ball->SetTexture("./assets/basketball.png");
     ball->restitution = 0.1;
     bodies.push_back(ball);
     
@@ -151,11 +153,19 @@ void Application::Render() {
 
         if (body->shape->GetType() == CIRCLE) {
             CircleShape* circleShape = (CircleShape*)body->shape; // 将粒子的形状转换为CircleShape类型，以便访问半径属性
-            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation,0xFF00FF00); // 在窗口中绘制一个填充的白色圆，圆心坐标为粒子的位置，半径为粒子的半径
+            if (!debug && body->texture){
+                Graphics::DrawTexture(body->position.x, body->position.y, circleShape->radius,circleShape->radius, body->rotation, body->texture);
+            }else{
+                Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation,0xFF00FF00);
+            }
         }
         if (body->shape->GetType() == BOX) {
             BoxShape* boxShape = (BoxShape*)body->shape; // 将粒子的形状转换为BoxShape类型，以便访问宽度和高度属性
-            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFF00FF00); // 在窗口中绘制一个填充的白色矩形，矩形中心坐标为粒子的位置，宽度和高度为粒子的宽度和高度
+            if (!debug && body->texture){
+                Graphics::DrawTexture(body->position.x, body->position.y, boxShape->width, boxShape->height, body->rotation, body->texture);
+            }else{
+                Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFF00FF00);
+            }
         }
         if (body->shape->GetType() == POLYGON){
             PolygonShape* polygonShape = (PolygonShape*) body->shape;

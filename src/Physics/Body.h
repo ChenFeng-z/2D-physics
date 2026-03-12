@@ -1,6 +1,8 @@
 #ifndef PARTICLE_H
 #define PARTICLE_H
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include "Vec2.h"
 #include "Shape.h"
 
@@ -28,10 +30,14 @@ struct Body
 
     Shape* shape = nullptr;
 
+    SDL_Texture* texture = nullptr; //生成纹理，指向SDL库
+
     Body(const Shape& shape, float x, float y, float mass);
     ~Body();
 
     bool IsStatic() const;
+
+    void SetTexture(const char* textureFileName);
 
     void ApplyImpulse(const Vec2& j);
     void ApplyImpulse(const Vec2& j, const Vec2& r);
