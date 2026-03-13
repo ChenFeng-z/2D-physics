@@ -10,10 +10,20 @@ class Constraint {
         Body* a;
         Body* b;
 
-        MatMN GetInvM();
-        VecN vec;
+        virtual ~Constraint() = default;
 
-        void Solve();
+        MatMN GetInvM() const;
+        VecN GetVelocities() const;
+
+        virtual void Solve();
+};
+
+class DistanceConstraint: public Constraint{
+
+};
+
+class PentrationConstraint: public Constraint {
+
 };
 
 #endif
