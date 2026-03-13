@@ -31,3 +31,14 @@ VecN Constraint::GetVelocities() const{
 
     return V;
 }
+
+JointConstraint::JointConstraint(): Constraint(), jacobian(1,6) {
+
+}
+
+JointConstraint::JointConstraint(Body* a, Body* b, const Vec2& anchorPoint): Constraint(), jacobian(1,6){
+    this->a = a;
+    this->b = b;
+    this->aPoint = a->WorldSpaceToLocalSpace(anchorPoint);
+    this->bPoint = b->WorldSpaceToLocalSpace(anchorPoint);
+} 
