@@ -14,7 +14,7 @@ World::~World(){
         delete body;
     }
     std::cout << "World destructor called!" << std::endl;
-}
+} 
 
 void World::AddBody(Body* body){
     bodies.push_back(body);
@@ -22,6 +22,14 @@ void World::AddBody(Body* body){
 
 std::vector<Body*>& World::GetBodies(){
     return bodies;
+}
+
+void World::AddConstraint(Constraint* constraint){
+    constraints.push_back(constraint);
+}
+
+std::vector<Constraint*>& World::GetConstraints(){
+    return constraints;
 }
 
 void World::AddForce(const Vec2& force){

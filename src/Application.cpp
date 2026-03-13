@@ -18,29 +18,11 @@ void Application::Setup() {
 
     world = new World(-9.8);
 
-    Body* floor = new Body(BoxShape(Graphics::Width() - 50, 50), Graphics::Width() / 2, Graphics::Height() - 50, 0.0);
-    Body* leftWall = new Body(BoxShape(50, Graphics::Height() - 100), 50, Graphics::Height() / 2.0 - 25, 0.0);
-    Body* rightWall = new Body(BoxShape(50, Graphics::Height() - 100), Graphics::Width() - 50, Graphics::Height() / 2.0 - 25, 0.0);
-    floor -> restitution = 0.5;
-    leftWall -> restitution = 0.2;
-    rightWall -> restitution = 0.2;
-    world->AddBody(floor);
-    world->AddBody(leftWall);
-    world->AddBody(rightWall);
-    Body* bigBox = new Body(BoxShape(200, 200), Graphics::Width() / 2, Graphics::Height() / 2, 0.0);
-    bigBox->SetTexture("./assets/crate.png");
-    bigBox->rotation = 1.4;
-    bigBox->restitution = 0.7;
-    world->AddBody(bigBox); 
-    
-    Body* ball = new Body(CircleShape(50), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 1.0);
-    ball->SetTexture("./assets/basketball.png");
-    ball->restitution = 0.1;
-    world->AddBody(ball);
+    Body* a = new Body(CircleShape(30), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 0.0f);
+    Body* b = new Body(CircleShape(30), a->position.x - 100, a->position.y, 1.0f);
 
-    Vec2 wind = Vec2(0.5 * PIXELS_PER_METER, 0.0);
-    world -> AddForce(wind);
-    
+    JointConstraint* joint = new JointConstraint(a, b, a->position);
+    world->AddConstraint(joint);
     /*
     liquid.x = 0;
     liquid.y = Graphics::Height() / 2; // 将液体区域的y坐标设置为窗口高度的一半

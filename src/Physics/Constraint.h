@@ -18,7 +18,7 @@ class Constraint {
         MatMN GetInvM() const;
         VecN GetVelocities() const;
 
-        virtual void Solve();
+        //virtual void Solve();
 };
 
 class JointConstraint: public Constraint{
@@ -28,7 +28,7 @@ class JointConstraint: public Constraint{
     public:
         JointConstraint();
         JointConstraint(Body* a, Body* b, const Vec2& anchorPoint);
-        void Solve() override;
+        //void Solve() override;
 };
 
 class PentrationConstraint: public Constraint {
