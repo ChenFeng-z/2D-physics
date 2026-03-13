@@ -41,4 +41,8 @@ JointConstraint::JointConstraint(Body* a, Body* b, const Vec2& anchorPoint): Con
     this->b = b;
     this->aPoint = a->WorldSpaceToLocalSpace(anchorPoint);
     this->bPoint = b->WorldSpaceToLocalSpace(anchorPoint);
-} 
+}
+
+void JointConstraint::Solve(){
+    
+}

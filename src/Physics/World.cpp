@@ -45,18 +45,27 @@ void World::Update(float dt){
     for (auto body : bodies){
         Vec2 weight = Vec2(0.0, body->mass * G * PIXELS_PER_METER);
         body -> AddForce(weight);
-        for (auto force : forces){
+
+        for (auto force : forces)
             body -> AddForce(force);
-        }
         
-        for (auto torque : torques){
+        
+        for (auto torque : torques)
             body -> AddTorque(torque);
-        }
+        
     }
 
-    for (auto body : bodies){
-        body -> Update(dt);
-    }
+     for (auto body : bodies){
+        body->IntegrateForces(dt);
+     }
+
+     for (auto& constraint : constraints){
+        constraint->Solve();
+     }
+
+     for (auto body : bodies){
+        body -> IntegrateVelocities(dt);
+     }
     
         CheckCollisions();
 }

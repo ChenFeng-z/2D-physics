@@ -53,6 +53,7 @@ struct Body
     void IntegrateLinear(float dt);
     void IntegrateAngular(float dt);
 
-    void Update(float dt);
+    void IntegrateForces(const float dt);
+    void IntegrateVelocities(const float dt);
 };
 #endif

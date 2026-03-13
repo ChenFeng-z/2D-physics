@@ -41,18 +41,6 @@ bool Body:: IsStatic() const{
     return fabs(inverseMass - 0.0) < epsilon;
 }
 
-void Body::IntegrateLinear(float dt) {
-    if (IsStatic()){
-        return;
-    }
-    acceleration = sumForces * inverseMass; // 根据牛顿第二定律计算加速度
-
-    velocity += acceleration * dt; // 更新粒子的速度，根据加速度和时间差计算新的速度
-    position += velocity * dt; // 更新粒子的位置，根据速度和时间差计算新的位置
-
-    ClearForces(); // 在每次积分后清空总力，以便下一次计算
-}
-
 void Body::AddTorque(float torque) {
     sumTorque += torque; // 将外力矩累加到总力矩上
 }
@@ -93,24 +81,34 @@ void Body::ApplyImpulse(const Vec2& j, const Vec2& r){
     angularVelocity += r.Cross(j) * invI;
 }
 
+void Body::IntegrateForces(const float dt){
+    if (IsStatic()){
+        return;
+    }
+    acceleration = sumForces * inverseMass; // 根据牛顿第二定律计算加速度
+
+    velocity += acceleration * dt; // 更新粒子的速度，根据加速度和时间差计算新的速度
+
+    angularAcceleration = sumTorque * invI; // 根据牛顿第二定律计算角加速度
+
+    angularVelocity += angularAcceleration * dt; // 更新粒子的角速度，根据角加速度和时间差计算新的角速度
+
+    ClearForces();
+    ClearTorque();
+}
+
+void Body::IntegrateVelocities(const float dt){
+    if (IsStatic()){
+        return;
+    }
+    position += velocity * dt;
+
+    rotation += angularVelocity * dt;
+
+    shape -> UpdateVertices(rotation, position);
+}
+
 void Body::ClearForces() {
     sumForces = Vec2(0, 0); // 清空总力
 }
 
-void Body::IntegrateAngular(float dt) {
-    if (IsStatic()){
-        return;
-    }
-    angularAcceleration = sumTorque * invI; // 根据牛顿第二定律计算角加速度
-
-    angularVelocity += angularAcceleration * dt; // 更新粒子的角速度，根据角加速度和时间差计算新的角速度
-    rotation += angularVelocity * dt; // 更新粒子的旋转角度，根据角速度和时间差计算新的旋转角度
-
-    ClearTorque(); // 在每次积分后清空总力矩，以便下一次计算
-}
-
-void Body::Update(float dt) {
-    IntegrateLinear(dt); // 更新粒子的位置和速度
-    IntegrateAngular(dt); // 更新粒子的旋转角度和角速度
-    shape->UpdateVertices(rotation, position);
-}
