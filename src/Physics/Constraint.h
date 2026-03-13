@@ -27,7 +27,7 @@ class JointConstraint: public Constraint{
     
     public:
         JointConstraint();
-        JointConstraint(Body* a, Body* b, Vec2& anchorPoint);
+        JointConstraint(Body* a, Body* b, const Vec2& anchorPoint);
         void Solve() override;
 };
 
