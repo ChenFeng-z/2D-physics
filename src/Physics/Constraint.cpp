@@ -64,5 +64,12 @@ void JointConstraint::Solve(){
     float J4 = rb.Cross(pb - pa) * 2.0;
     jacobian.rows[0][5] = J4;
 
-    
+    const VecN V = GetVelocities(); 
+    const MatMN invM = GetInvM();
+
+    const MatMN J = jacobian;
+    const MatMN Jt = jacobian.Transpose();
+
+    MatMN lhs = J * invM * Jt; //A
+    VecN rhs = J * V * -1.0f;  //B
 }
