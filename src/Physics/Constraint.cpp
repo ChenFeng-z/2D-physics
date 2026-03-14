@@ -72,4 +72,6 @@ void JointConstraint::Solve(){
 
     MatMN lhs = J * invM * Jt; //A
     VecN rhs = J * V * -1.0f;  //B
+
+    VecN lambda = MatMN::SolveGaussSeidel(lhs, rhs);
 }
