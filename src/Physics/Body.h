@@ -50,9 +50,6 @@ struct Body
     void ClearTorque();
     void ClearForces();
 
-    void IntegrateLinear(float dt);
-    void IntegrateAngular(float dt);
-
     void IntegrateForces(const float dt);
     void IntegrateVelocities(const float dt);
 };
