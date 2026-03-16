@@ -20,6 +20,8 @@ void Application::Setup() {
 
     Body* a = new Body(CircleShape(30), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 0.0f);
     Body* b = new Body(CircleShape(30), a->position.x - 100, a->position.y, 1.0f);
+    world->AddBody(a);
+    world->AddBody(b);
 
     JointConstraint* joint = new JointConstraint(a, b, a->position);
     world->AddConstraint(joint);

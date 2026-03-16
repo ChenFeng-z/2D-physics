@@ -74,4 +74,11 @@ void JointConstraint::Solve(){
     VecN rhs = J * V * -1.0f;  //B
 
     VecN lambda = MatMN::SolveGaussSeidel(lhs, rhs);
+
+    VecN impulses = Jt * lambda;
+
+    a->ApplyImpulseLinear(Vec2(impulses[0], impulses[1])); // A linear impulse
+    a->ApplyImpulseAngular(impulses[2]);                   // A angular impulse
+    b->ApplyImpulseLinear(Vec2(impulses[3], impulses[4])); // B linear impulse
+    b->ApplyImpulseAngular(impulses[5]);                   // B angular impulse
 }

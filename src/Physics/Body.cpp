@@ -66,17 +66,21 @@ Vec2 Body::WorldSpaceToLocalSpace(const Vec2& point) const {
     return Vec2(rotatedX, rotatedY);
 }
 
-void Body::ApplyImpulse(const Vec2& j){
-    if (IsStatic()){
+void Body::ApplyImpulseLinear(const Vec2& j) {
+    if (IsStatic())
         return;
-    }
     velocity += j * inverseMass;
 }
 
-void Body::ApplyImpulse(const Vec2& j, const Vec2& r){
-    if (IsStatic()){
+void Body::ApplyImpulseAngular(const float j) {
+    if (IsStatic())
         return;
-    }
+    angularVelocity += j * invI;
+}
+
+void Body::ApplyImpulseAtPoint(const Vec2& j, const Vec2& r) {
+    if (IsStatic())
+        return;
     velocity += j * inverseMass;
     angularVelocity += r.Cross(j) * invI;
 }

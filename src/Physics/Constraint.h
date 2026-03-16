@@ -18,7 +18,7 @@ class Constraint {
         MatMN GetInvM() const;
         VecN GetVelocities() const;
 
-        virtual void Solve();
+        virtual void Solve() = 0;
 };
 
 class JointConstraint: public Constraint{
