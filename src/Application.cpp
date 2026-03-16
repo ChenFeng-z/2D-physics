@@ -16,22 +16,23 @@ bool Application::IsRunning() {
 void Application::Setup() {
     running = Graphics::OpenWindow();  // 系统调用，通过Graphics类打开窗口并返回是否成功打开的结果
 
-    world = new World(-9.8);
+    world = new World(-2.8);
 
-    Body* a = new Body(CircleShape(30), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 0.0f);
-    Body* b = new Body(CircleShape(30), a->position.x - 100, a->position.y, 1.0f);
-    world->AddBody(a);
-    world->AddBody(b);
+    const int NUM_BODIES = 8;
+    for (int i = 0; i < NUM_BODIES; i++) {
+        float mass = (i == 0) ? 0.0f : 1.0f;
+        Body* body = new Body(BoxShape(30, 30), Graphics::Width() / 2.0 - (i * 40), 100, mass);
+        body->SetTexture("./assets/crate.png");
+        world->AddBody(body);
+    }
 
-    JointConstraint* joint = new JointConstraint(a, b, a->position);
-    world->AddConstraint(joint);
-    /*
-    liquid.x = 0;
-    liquid.y = Graphics::Height() / 2; // 将液体区域的y坐标设置为窗口高度的一半
-    liquid.w = Graphics::Width();
-    liquid.h = Graphics::Height() / 2; // 将液体区域的高度设置为窗口高度的一半
-    */
-    // TODO: setup objects in the scene
+    for (int i = 0; i < NUM_BODIES - 1; i++) {
+        Body* a = world->GetBodies()[i];
+        Body* b = world->GetBodies()[i + 1];
+        JointConstraint* joint = new JointConstraint(a, b, a->position);
+        world->AddConstraint(joint);
+    }
+    
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,7 +102,11 @@ void Application::Update() {
 void Application::Render() {
     
     //Graphics::DrawFillRect(liquid.x + liquid.w / 2, liquid.y + liquid.h / 2, liquid.w, liquid.h, 0xFF0B3C4D); // 绘制一个填充的矩形，表示液体区域，使用指定的颜色（十六进制ARGB格式）
-    
+    for (auto joint: world->GetConstraints()) {
+        const Vec2 pa = joint->a->LocalSpaceToWorldSpace(joint->aPoint);
+        const Vec2 pb = joint->b->LocalSpaceToWorldSpace(joint->aPoint);
+        Graphics::DrawLine(pa.x, pa.y, pb.x, pb.y, 0xFF555555);
+    }
 
     for (auto body : world -> GetBodies()) {
 

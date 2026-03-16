@@ -19,6 +19,7 @@ Body::Body(const Shape& shape, float x, float y, float mass) {
     this->inverseMass = (mass != 0) ? 1.0f / mass : 0.0f; // 计算质量的倒数，避免除以零
     I = shape.GetMomentOfInertia() * mass; 
     this->invI = (I != 0) ? 1.0f / I : 0.0f;
+    this->shape->UpdateVertices(rotation, position);
     std::cout << "Body constructor called!" << std::endl;
 }
 
