@@ -18,16 +18,18 @@ class Constraint {
         MatMN GetInvM() const;
         VecN GetVelocities() const;
 
+        virtual void PreSolve() = 0;
         virtual void Solve() = 0;
 };
 
 class JointConstraint: public Constraint{
     private:
         MatMN jacobian;
-    
+        VecN cachedLambda;
     public:
         JointConstraint();
         JointConstraint(Body* a, Body* b, const Vec2& anchorPoint);
+        void PreSolve() override;
         void Solve() override;
 };
 

@@ -60,7 +60,13 @@ void World::Update(float dt){
      }
 
      for (auto& constraint : constraints){
+        constraint->PreSolve();
+     }
+
+     for (int i = 0; i < 5; i++){
+        for (auto& constraint : constraints){
         constraint->Solve();
+        }
      }
 
      for (auto body : bodies){
