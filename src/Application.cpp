@@ -18,22 +18,22 @@ void Application::Setup() {
 
     world = new World(-2.8);
 
-    const int NUM_BODIES = 8;
-    for (int i = 0; i < NUM_BODIES; i++) {
-        float mass = (i == 0) ? 0.0f : 1.0f;
-        Body* body = new Body(BoxShape(30, 30), Graphics::Width() / 2.0 - (i * 40), 100, mass);
-        body->SetTexture("./assets/crate.png");
-        world->AddBody(body);
-    }
+    Body* bigBall = new Body(CircleShape(64), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 0.0);
+    bigBall->SetTexture("./assets/bowlingball.png");
+    world->AddBody(bigBall);
 
-    for (int i = 0; i < NUM_BODIES - 1; i++) {
-        Body* a = world->GetBodies()[i];
-        Body* b = world->GetBodies()[i + 1];
-        JointConstraint* joint = new JointConstraint(a, b, a->position);
-        world->AddConstraint(joint);
-    }
-    
+    Body* floor = new Body(BoxShape(Graphics::Width() - 50, 50), Graphics::Width() / 2.0, Graphics::Height() - 50, 0.0);
+    Body* leftWall = new Body(BoxShape(50, Graphics::Height() - 100), 50, Graphics::Height() / 2.0 - 25, 0.0);
+    Body* rightWall = new Body(BoxShape(50, Graphics::Height() - 100), Graphics::Width() - 50, Graphics::Height() / 2.0 - 25, 0.0);
+    floor->restitution = 0.7;
+    leftWall->restitution = 0.2;
+    rightWall->restitution = 0.2;
+    world->AddBody(floor);
+    world->AddBody(leftWall);
+    world->AddBody(rightWall);
 }
+    
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Input processing
@@ -57,7 +57,7 @@ void Application::Input() {
                     SDL_GetMouseState(&x, &y);
                     Body* ball = new Body(CircleShape(30), x, y, 1.0);
                     ball->SetTexture("./assets/basketball.png");
-                    ball->restitution = 0.5;
+                    ball->restitution = 0.7;
                     world->AddBody(ball);
                 }
                 if (event.button.button == SDL_BUTTON_RIGHT){

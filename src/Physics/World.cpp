@@ -13,6 +13,9 @@ World::~World(){
     for (auto body: bodies){
         delete body;
     }
+    for (auto constraint: constraints){
+        delete constraint;
+    }
     std::cout << "World destructor called!" << std::endl;
 } 
 
@@ -42,6 +45,8 @@ void World::AddTorque(const float torque){
 
 
 void World::Update(float dt){
+    std::vector<PentrationConstraint> penetrations;
+
     for (auto body : bodies){
         Vec2 weight = Vec2(0.0, body->mass * G * PIXELS_PER_METER);
         body -> AddForce(weight);
@@ -59,33 +64,36 @@ void World::Update(float dt){
         body->IntegrateForces(dt);
      }
 
+     for (int i = 0; i <= bodies.size() - 1; i++){
+        for (int j = i + 1; j < bodies.size(); j ++){
+            Body* a = bodies[i];
+            Body* b = bodies[j];
+            Contact contact;
+            if (CollisionDetection::IsColliding(a, b, contact)){
+                PentrationConstraint penetration(contact.a, contact.b, contact.start, contact.end, contact.normal);
+                penetrations.push_back(penetration);
+            }
+        }
+    }
+
      for (auto& constraint : constraints){
         constraint->PreSolve(dt);
+     }
+
+     for (auto& constraint:penetrations){
+        constraint.PreSolve(dt);
      }
 
      for (int i = 0; i < 5; i++){
         for (auto& constraint : constraints){
         constraint->Solve();
         }
+        for (auto& constraint : penetrations){
+        constraint.Solve();
+        }
      }
 
-     for (auto body : bodies){
+     for (auto& body : bodies){
         body -> IntegrateVelocities(dt);
      }
-    
-        CheckCollisions();
-}
-
-void World::CheckCollisions(){
-    for (int i = 0; i <= bodies.size() - 1; i++){
-        for (int j = i + 1; j < bodies.size(); j ++){
-            Body* a = bodies[i];
-            Body* b = bodies[j];
-            Contact contact;
-            if (CollisionDetection::IsColliding(a, b, contact)){
-                contact.ResolveCollision();
-
-            }
-        }
-    }
 }
