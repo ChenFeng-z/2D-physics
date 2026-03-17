@@ -1,4 +1,6 @@
 #include "Constraint.h"
+#include <algorithm>
+
 
 MatMN Constraint::GetInvM() const {
     MatMN invM(6, 6);
@@ -113,7 +115,7 @@ PentrationConstraint::PentrationConstraint(): Constraint(), jacobian(2, 6), cach
     cachedLambda.Zero();
     friction = 0.0f;
 }
-
+ 
 PentrationConstraint::PentrationConstraint(Body* a, Body* b, const Vec2& aCollisionPoint, const Vec2& bCollisionPoint, const Vec2& normal): Constraint(), jacobian(2, 6), cachedLambda(2), bias(0.0f) {
     this->a = a;
     this->b = b;
@@ -192,6 +194,11 @@ void PentrationConstraint::Solve() {
     VecN oldlambda = cachedLambda;
     cachedLambda += lambda;
     cachedLambda[0] = (cachedLambda[0] < 0.0f) ? 0.0f : cachedLambda[0];
+
+    if (friction > 0.0) {
+		const float maxFriction = cachedLambda[0] * friction;
+        cachedLambda[1] = std::clamp(cachedLambda[1], -maxFriction, maxFriction);
+	}
     lambda = cachedLambda - oldlambda;
 
     // Compute the impulses with both direction and magnitude
