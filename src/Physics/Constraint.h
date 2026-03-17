@@ -40,6 +40,7 @@ class PentrationConstraint: public Constraint {
         VecN cachedLambda;
         float bias;
 
+        float friction;
         Vec2 normal;
     public:
         PentrationConstraint();
