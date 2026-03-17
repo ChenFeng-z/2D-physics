@@ -175,7 +175,16 @@ void PentrationConstraint::PreSolve(const float dt) {
     
     float C = (pb - pa).Dot(n * -1);
     C = std::min(0.0f, C + 0.01f);
-    bias = (beta / dt) * C;
+
+    Vec2 va = a->velocity + Vec2(-a->angularVelocity * ra.y, a->angularVelocity * ra.x);
+    Vec2 vb = b->velocity + Vec2(-b->angularVelocity * rb.y, b->angularVelocity * rb.x);
+	float vrelDotNormal = (va - vb).Dot(n);
+
+	// Get the restitution between the two bodies
+	float e = std::min(a->restitution, b->restitution);
+
+	// Calculate bias term considering elasticity (restitution)
+	bias = (beta / dt) * C + (e * vrelDotNormal);
 }
 
 void PentrationConstraint::Solve() {
