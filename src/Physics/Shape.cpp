@@ -68,7 +68,7 @@ void PolygonShape::UpdateVertices(float angle, const Vec2& position) {
     }
 }
 
-float PolygonShape::FindMinSeparation(const PolygonShape* other, Vec2& axis, Vec2& point) const{
+float PolygonShape::FindMinSeparation(const PolygonShape* other, int& indexReferenceEdge, Vec2& supportPoint) const{
     float separation = std::numeric_limits<float>::lowest();
 
     for (int i = 0; i < this->worldVertices.size(); i++){
@@ -88,11 +88,53 @@ float PolygonShape::FindMinSeparation(const PolygonShape* other, Vec2& axis, Vec
 
         if (minSep > separation){
             separation = minSep;
-            axis = this->EdgeAt(i); //找到进入边的法向量
-            point = minVertex;   //找到进入的点
+            indexReferenceEdge = i;
+            supportPoint = minVertex;
         }
     }
     return separation;
+}
+
+int PolygonShape::FindIncidentEdge(const Vec2& normal) const {
+    int indexIncidentEdge;
+    float minProj = std::numeric_limits<float>::max();
+    for (int i = 0; i < this->worldVertices.size(); ++i) {
+        auto edgeNormal = this->EdgeAt(i).Normal();
+        auto proj = edgeNormal.Dot(normal);
+        if (proj < minProj) {
+            minProj = proj;
+            indexIncidentEdge = i;
+        }
+    }
+    return indexIncidentEdge;
+}
+
+int PolygonShape::ClipSegmentToLine(const std::vector<Vec2>& contactsIn, std::vector<Vec2>& contactsOut, const Vec2& c0, const Vec2& c1) const {
+    // Start with no output points
+    int numOut = 0;
+
+    // Calculate the distance of end points to the line
+    Vec2 normal = (c1 - c0).Normalized();
+    float dist0 = (contactsIn[0] - c0).Cross(normal);
+    float dist1 = (contactsIn[1] - c0).Cross(normal);
+
+    // If the points are behind the plane
+    if (dist0 <= 0)
+        contactsOut[numOut++] = contactsIn[0];
+    if (dist1 <= 0)
+        contactsOut[numOut++] = contactsIn[1];
+
+    // If the points are on different sides of the plane (one distance is negative and the other is positive)
+    if (dist0 * dist1 < 0) {
+        float totalDist = dist0 - dist1;
+
+        // Fint the intersection using linear interpolation: lerp(start,end) => start + t*(end-start)
+        float t = dist0 / (totalDist);
+        Vec2 contact = contactsIn[0] + (contactsIn[1] - contactsIn[0]) * t;
+        contactsOut[numOut] = contact;
+        numOut++;
+    }
+    return numOut;
 }
 
 BoxShape::BoxShape(const float width, const float height) {
