@@ -16,21 +16,20 @@ bool Application::IsRunning() {
 void Application::Setup() {
     running = Graphics::OpenWindow();  // 系统调用，通过Graphics类打开窗口并返回是否成功打开的结果
 
-    world = new World(-2.8);
-
-    Body* bigBall = new Body(CircleShape(64), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 0.0);
-    bigBall->SetTexture("./assets/bowlingball.png");
-    world->AddBody(bigBall);
-
     Body* floor = new Body(BoxShape(Graphics::Width() - 50, 50), Graphics::Width() / 2.0, Graphics::Height() - 50, 0.0);
     Body* leftWall = new Body(BoxShape(50, Graphics::Height() - 100), 50, Graphics::Height() / 2.0 - 25, 0.0);
     Body* rightWall = new Body(BoxShape(50, Graphics::Height() - 100), Graphics::Width() - 50, Graphics::Height() / 2.0 - 25, 0.0);
-    floor->restitution = 0.7;
-    leftWall->restitution = 0.2;
-    rightWall->restitution = 0.2;
     world->AddBody(floor);
     world->AddBody(leftWall);
     world->AddBody(rightWall);
+
+    // Add rigid bodies to the scene
+    Body* a = new Body(BoxShape(200, 200), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 0.0);
+    Body* b = new Body(BoxShape(200, 200), 300, 0, 0.0);
+    a->rotation = 0.0;
+    b->rotation = 0.0;
+    world->AddBody(a);
+    world->AddBody(b);
 }
     
 
@@ -67,8 +66,15 @@ void Application::Input() {
                     box->SetTexture("./assets/crate.png");
                     box->restitution = 0.2;
                     world->AddBody(box);
-                break;
                 }
+                break;
+            case SDL_MOUSEMOTION:
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                Body* box = world->GetBodies()[4];
+                box->position.x = x;
+                box->position.y = y;
+                break;
         }
     }         
 }
