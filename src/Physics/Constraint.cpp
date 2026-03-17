@@ -176,7 +176,11 @@ void PentrationConstraint::Solve() {
     VecN rhs = J * V * -1.0f;   // b
     rhs[0] -= bias;
     VecN lambda = MatMN::SolveGaussSeidel(lhs, rhs);
-    //cachedLambda += lambda;
+
+    VecN oldlambda = cachedLambda;
+    cachedLambda += lambda;
+    cachedLambda[0] = (cachedLambda[0] < 0.0f) ? 0.0f : cachedLambda[0];
+    lambda = cachedLambda - oldlambda;
 
     // Compute the impulses with both direction and magnitude
     VecN impulses = Jt * lambda;
